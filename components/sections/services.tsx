@@ -2,7 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
-import { KubahIcon, MimbarIcon, MenaraIcon, KerawanganIcon, KaligrafiIcon, MasjidIcon } from "@/components/icons"
+import { KubahIcon, MimbarIcon, MenaraIcon, KerawanganIcon, KaligrafiIcon, MasjidIcon, OrnamentIcon } from "@/components/icons"
 
 const services = [
   {
@@ -19,7 +19,7 @@ const services = [
     description:
       "Pembuatan kubah masjid dengan berbagai ukuran dan desain, menggunakan material berkualitas tinggi dan tahan lama.",
     image: "/kubah/kubah5.webp?height=300&width=400",
-    slug: "kubah-masjid",
+    slug: "kubah",
   },
   {
     icon: <MimbarIcon className="h-10 w-10 text-primary" />,
@@ -27,7 +27,7 @@ const services = [
     description:
       "Mimbar masjid dengan desain elegan dan ukiran yang indah, dibuat dari kayu pilihan dan dikerjakan oleh pengrajin berpengalaman.",
     image: "/mimbar/mimbar5.webp?height=300&width=400",
-    slug: "mimbar-masjid",
+    slug: "mimbar",
   },
   {
     icon: <MenaraIcon className="h-10 w-10 text-primary" />,
@@ -35,7 +35,7 @@ const services = [
     description:
       "Menara masjid dengan berbagai model dan ketinggian, dirancang dengan memperhatikan aspek estetika dan keamanan.",
     image: "/menara/menara5.webp?height=300&width=400",
-    slug: "menara-masjid",
+    slug: "menara",
   },
   {
     icon: <KerawanganIcon className="h-10 w-10 text-primary" />,
@@ -50,7 +50,15 @@ const services = [
     description:
       "Awan kaligrafi dengan tulisan ayat-ayat Al-Quran, dibuat dengan teknik khusus untuk menghasilkan karya yang indah dan bermakna.",
     image: "/kaligrafi/kaligrafi5.webp?height=300&width=400",
-    slug: "awan-kaligrafi",
+    slug: "kaligrafi",
+  },
+  {
+    icon: <OrnamentIcon className="h-10 w-10 text-primary" />,
+    title: "Ornamen Masjid",
+    description:
+      "Berbagai ornamen masjid berkualitas tinggi untuk memperindah tempat ibadah Anda.",
+    image: "/ornamen/ornamen5.webp?height=300&width=400",
+    slug: "ornamen",
   },
 ]
 

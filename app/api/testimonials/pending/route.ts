@@ -12,7 +12,18 @@ export async function GET() {
       },
     })
 
-    return NextResponse.json({ success: true, testimonials })
+    // Get the count of pending testimonials
+    const pendingCount = await prisma.testimonial.count({
+      where: {
+        approved: false,
+      },
+    })
+
+    return NextResponse.json({
+      success: true,
+      testimonials,
+      pendingCount,
+    })
   } catch (error) {
     console.error("Error fetching pending testimonials:", error)
     return NextResponse.json({ success: false, error: "Failed to fetch pending testimonials" }, { status: 500 })

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -15,223 +15,17 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import ExportAnalyticsButton from "@/components/analytics/export-analytics-button"
 
-// Tambahkan interface untuk data analytics di bagian atas file
-interface AnalyticsData {
-  dailyAnalytics: DailyAnalytic[]
-  totalPageViews: number
-  uniqueVisitors: number
-  topPages: TopPage[]
-  topCountries: TopCountry[]
-  topCities: TopCity[]
-  deviceBreakdown: DeviceBreakdown[]
-  browserBreakdown: BrowserBreakdown[]
-  realTimeVisitors: RealTimeVisitor[]
-}
-
-interface DailyAnalytic {
-  date: string
-  pageViews: number
-  uniqueVisitors: number
-  newVisitors: number
-  returningVisitors: number
-  avgSessionDuration: number
-  bounceRate: number
-}
-
-interface TopPage {
-  path: string
-  pageTitle?: string
-  _count: { path: number }
-}
-
-interface TopCountry {
-  country: string
-  _count: { id: number }
-}
-
-interface TopCity {
-  city: string
-  country: string
-  _count: { id: number }
-}
-
-interface DeviceBreakdown {
-  deviceType: string
-  _count: { id: number }
-}
-
-interface BrowserBreakdown {
-  browser: string
-  _count: { id: number }
-}
-
-interface RealTimeVisitor {
-  id: string
-  country: string
-  city: string
-  browser: string
-  device: string
-  currentPage: string
-  lastActive: string
-}
-
-// Tambahkan fungsi helper untuk memformat data
-const formatSessionDuration = (seconds: number): string => {
-  if (!seconds) return "0m 0s"
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  return `${minutes}m ${remainingSeconds}s`
-}
-
-// Tambahkan fungsi helper untuk mendapatkan warna berdasarkan tipe
-const getDeviceColor = (deviceType: string): string => {
-  const type = deviceType.toLowerCase()
-  if (type.includes("desktop")) return deviceColors.Desktop
-  if (type.includes("mobile")) return deviceColors.Mobile
-  if (type.includes("tablet")) return deviceColors.Tablet
-  return deviceColors.Other
-}
-
-const getBrowserColor = (browser: string): string => {
-  const name = browser.toLowerCase()
-  if (name.includes("chrome")) return browserColors.Chrome
-  if (name.includes("firefox")) return browserColors.Firefox
-  if (name.includes("safari")) return browserColors.Safari
-  if (name.includes("edge")) return browserColors.Edge
-  if (name.includes("opera")) return browserColors.Opera
-  if (name.includes("samsung")) return browserColors["Samsung Internet"]
-  if (name.includes("ie") || name.includes("internet explorer")) return browserColors.IE
-  return browserColors.Other
-}
-
-// Device type colors for the chart
-const deviceColors = {
-  Desktop: "#0ea5e9", // Sky blue
-  Mobile: "#8b5cf6", // Purple
-  Tablet: "#10b981", // Emerald
-  Other: "#f59e0b", // Amber
-}
-
-// Browser colors for the chart
-const browserColors = {
-  Chrome: "#0ea5e9", // Sky blue
-  Firefox: "#f97316", // Orange
-  Safari: "#10b981", // Emerald
-  Edge: "#0284c7", // Blue
-  Opera: "#ef4444", // Red
-  "Samsung Internet": "#8b5cf6", // Purple
-  IE: "#6b7280", // Gray
-  Other: "#f59e0b", // Amber
-}
-
-// Refactor data preparation functions untuk lebih modular
-const prepareVisitorChartData = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.dailyAnalytics) return []
-
-  return analyticsData.dailyAnalytics.map((day: any) => ({
-    date: format(new Date(day.date), "dd MMM"),
-    "Page Views": day.pageViews || 0,
-    "Unique Visitors": day.uniqueVisitors || 0,
-    "New Visitors": day.newVisitors || 0,
-    "Returning Visitors": day.returningVisitors || 0,
-  }))
-}
-
-const prepareDeviceData = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.deviceBreakdown) return []
-
-  return analyticsData.deviceBreakdown.map((item: any) => ({
-    name: item.deviceType.charAt(0).toUpperCase() + item.deviceType.slice(1),
-    value: item._count.id,
-  }))
-}
-
-const prepareBrowserData = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.browserBreakdown) return []
-
-  return analyticsData.browserBreakdown.map((item: any) => ({
-    name: item.browser,
-    value: item._count.id,
-  }))
-}
-
-const prepareTopPagesData = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.topPages) return []
-
-  return analyticsData.topPages.map((page: any) => ({
-    path: page.path,
-    title: page.pageTitle || page.path,
-    views: page._count.path,
-  }))
-}
-
-const prepareTopCountriesData = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.topCountries) return []
-
-  return analyticsData.topCountries.map((country: any) => ({
-    country: country.country || "Unknown",
-    visitors: country._count.id,
-  }))
-}
-
-const prepareTopCitiesData = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.topCities) return []
-
-  return analyticsData.topCities.map((city: any) => ({
-    city: city.city || "Unknown",
-    country: city.country || "Unknown",
-    visitors: city._count.id,
-  }))
-}
-
-// Refactor calculation functions untuk lebih modular
-const getAvgSessionDuration = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.dailyAnalytics || analyticsData.dailyAnalytics.length === 0) return 0
-
-  // Calculate average across all days with proper weighting by page views
-  let totalDuration = 0
-  let totalPageViews = 0
-
-  analyticsData.dailyAnalytics.forEach((day) => {
-    if (day.avgSessionDuration && day.pageViews) {
-      totalDuration += day.avgSessionDuration * day.pageViews
-      totalPageViews += day.pageViews
-    }
-  })
-
-  return totalPageViews > 0 ? Math.round(totalDuration / totalPageViews) : 0
-}
-
-const getBounceRate = (analyticsData: AnalyticsData | null) => {
-  if (!analyticsData?.dailyAnalytics || analyticsData.dailyAnalytics.length === 0) return 0
-
-  // Calculate weighted average bounce rate
-  let totalBounces = 0
-  let totalSessions = 0
-
-  analyticsData.dailyAnalytics.forEach((day) => {
-    if (day.bounceRate !== null && day.uniqueVisitors) {
-      // Convert bounce rate percentage to number of bounces
-      const bounces = Math.round((day.bounceRate / 100) * day.uniqueVisitors)
-      totalBounces += bounces
-      totalSessions += day.uniqueVisitors
-    }
-  })
-
-  return totalSessions > 0 ? Math.round((totalBounces / totalSessions) * 100) : 0
-}
-
 export default function AnalyticsPage() {
   const [startDate, setStartDate] = useState<Date>(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
   const [endDate, setEndDate] = useState<Date>(new Date())
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
+  const [analyticsData, setAnalyticsData] = useState<any>(null)
   const [realTimeVisitors, setRealTimeVisitors] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState("overview")
   const { toast } = useToast()
 
-  // Refactor fetchAnalytics function untuk lebih modular
+  // Fetch analytics data
   const fetchAnalytics = async () => {
     try {
       setIsLoading(true)
@@ -257,7 +51,7 @@ export default function AnalyticsPage() {
     }
   }
 
-  // Refactor fetchRealTimeVisitors function untuk lebih modular
+  // Fetch real-time visitors
   const fetchRealTimeVisitors = async () => {
     try {
       const response = await fetch("/api/analytics?realTime=true")
@@ -273,7 +67,7 @@ export default function AnalyticsPage() {
     }
   }
 
-  // Refactor refreshAnalytics function untuk lebih modular
+  // Refresh analytics data
   const refreshAnalytics = async () => {
     try {
       setIsRefreshing(true)
@@ -324,7 +118,26 @@ export default function AnalyticsPage() {
     }
   }, [activeTab])
 
+  // Format session duration for display
+  const formatSessionDuration = (seconds: number) => {
+    if (!seconds) return "0m 0s"
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}m ${remainingSeconds}s`
+  }
+
   // Prepare chart data
+  const prepareVisitorChartData = () => {
+    if (!analyticsData?.dailyAnalytics) return []
+
+    return analyticsData.dailyAnalytics.map((day: any) => ({
+      date: format(new Date(day.date), "dd MMM"),
+      "Page Views": day.pageViews || 0,
+      "Unique Visitors": day.uniqueVisitors || 0,
+      "New Visitors": day.newVisitors || 0,
+      "Returning Visitors": day.returningVisitors || 0,
+    }))
+  }
 
   // Add a custom tooltip for the visitor chart to show more detailed information
   const visitorChartTooltip = (props: any) => {
@@ -347,18 +160,136 @@ export default function AnalyticsPage() {
   }
 
   // Prepare device breakdown data
+  const prepareDeviceData = () => {
+    if (!analyticsData?.deviceBreakdown) return []
+
+    return analyticsData.deviceBreakdown.map((item: any) => ({
+      name: item.deviceType.charAt(0).toUpperCase() + item.deviceType.slice(1),
+      value: item._count.id,
+    }))
+  }
 
   // Prepare browser breakdown data
+  const prepareBrowserData = () => {
+    if (!analyticsData?.browserBreakdown) return []
+
+    return analyticsData.browserBreakdown.map((item: any) => ({
+      name: item.browser,
+      value: item._count.id,
+    }))
+  }
 
   // Prepare top pages data
+  const prepareTopPagesData = () => {
+    if (!analyticsData?.topPages) return []
+
+    return analyticsData.topPages.map((page: any) => ({
+      path: page.path,
+      title: page.pageTitle || page.path,
+      views: page._count.path,
+    }))
+  }
 
   // Prepare top countries data
+  const prepareTopCountriesData = () => {
+    if (!analyticsData?.topCountries) return []
+
+    return analyticsData.topCountries.map((country: any) => ({
+      country: country.country || "Unknown",
+      visitors: country._count.id,
+    }))
+  }
 
   // Prepare top cities data
+  const prepareTopCitiesData = () => {
+    if (!analyticsData?.topCities) return []
+
+    return analyticsData.topCities.map((city: any) => ({
+      city: city.city || "Unknown",
+      country: city.country || "Unknown",
+      visitors: city._count.id,
+    }))
+  }
 
   // Get average session duration from analytics data
+  const getAvgSessionDuration = () => {
+    if (!analyticsData?.dailyAnalytics || analyticsData.dailyAnalytics.length === 0) return 0
+
+    // Calculate average across all days with proper weighting by page views
+    let totalDuration = 0
+    let totalPageViews = 0
+
+    analyticsData.dailyAnalytics.forEach((day: { avgSessionDuration: number; pageViews: number }) => {
+      if (day.avgSessionDuration && day.pageViews) {
+        totalDuration += day.avgSessionDuration * day.pageViews
+        totalPageViews += day.pageViews
+      }
+    })
+
+    return totalPageViews > 0 ? Math.round(totalDuration / totalPageViews) : 0
+  }
 
   // Get bounce rate from analytics data
+  const getBounceRate = () => {
+    if (!analyticsData?.dailyAnalytics || analyticsData.dailyAnalytics.length === 0) return 0
+
+    // Calculate weighted average bounce rate
+    let totalBounces = 0
+    let totalSessions = 0
+
+    analyticsData.dailyAnalytics.forEach((day: { bounceRate: number | null; uniqueVisitors: number }) => {
+      if (day.bounceRate !== null && day.uniqueVisitors) {
+        // Convert bounce rate percentage to number of bounces
+        const bounces = Math.round((day.bounceRate / 100) * day.uniqueVisitors)
+        totalBounces += bounces
+        totalSessions += day.uniqueVisitors
+      }
+    })
+
+    return totalSessions > 0 ? Math.round((totalBounces / totalSessions) * 100) : 0
+  }
+
+  // Device type colors for the chart
+  const deviceColors = {
+    Desktop: "#0ea5e9", // Sky blue
+    Mobile: "#8b5cf6", // Purple
+    Tablet: "#10b981", // Emerald
+    Other: "#f59e0b", // Amber
+  }
+
+  // Browser colors for the chart
+  const browserColors = {
+    Chrome: "#0ea5e9", // Sky blue
+    Firefox: "#f97316", // Orange
+    Safari: "#10b981", // Emerald
+    Edge: "#0284c7", // Blue
+    Opera: "#ef4444", // Red
+    "Samsung Internet": "#8b5cf6", // Purple
+    IE: "#6b7280", // Gray
+    Other: "#f59e0b", // Amber
+  }
+
+  // Get color for device
+  const getDeviceColor = (deviceType: string) => {
+    const type = deviceType.toLowerCase()
+    if (type.includes("desktop")) return deviceColors.Desktop
+    if (type.includes("mobile")) return deviceColors.Mobile
+    if (type.includes("tablet")) return deviceColors.Tablet
+    return deviceColors.Other
+  }
+
+  // Get color for browser
+  const getBrowserColor = (browser: string) => {
+    const name = browser.toLowerCase()
+    if (name.includes("chrome")) return browserColors.Chrome
+    if (name.includes("firefox")) return browserColors.Firefox
+    if (name.includes("safari")) return browserColors.Safari
+    if (name.includes("edge")) return browserColors.Edge
+    if (name.includes("opera")) return browserColors.Opera
+    if (name.includes("samsung")) return browserColors["Samsung Internet"]
+    if (name.includes("ie") || name.includes("internet explorer")) return browserColors.IE
+    return browserColors.Other
+  }
 
   return (
     <div className="space-y-6">
@@ -374,13 +305,14 @@ export default function AnalyticsPage() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn("justify-start text-left font-normal", !startDate && "text-muted-foreground")}
+                  className={cn("justify-start text-left font-normal rounded-xl", !startDate && "text-muted-foreground")}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, "PPP") : "Start date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 bg-white">
+
                 <Calendar
                   mode="single"
                   selected={startDate}
@@ -394,21 +326,21 @@ export default function AnalyticsPage() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn("justify-start text-left font-normal", !endDate && "text-muted-foreground")}
+                  className={cn("justify-start text-left font-normal rounded-xl", !endDate && "text-muted-foreground")}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, "PPP") : "End date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 bg-white">
                 <Calendar mode="single" selected={endDate} onSelect={(date) => date && setEndDate(date)} initialFocus />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={refreshAnalytics} disabled={isRefreshing}>
-              <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            <Button className="rounded-xl" onClick={refreshAnalytics} disabled={isRefreshing}>
+              <RefreshCw className={`mr-2 h-4 w-4 rounded-xl ${isRefreshing ? "animate-spin" : ""}`} />
               Refresh
             </Button>
 
@@ -427,7 +359,7 @@ export default function AnalyticsPage() {
 
         <TabsContent value="overview" className="space-y-6">
           {isLoading ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 rounded-xl">
               {[1, 2, 3, 4].map((i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader className="pb-2">
@@ -471,9 +403,7 @@ export default function AnalyticsPage() {
                   <CardTitle className="text-sm font-medium">Avg. Session Duration</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">
-                    {formatSessionDuration(getAvgSessionDuration(analyticsData))}
-                  </div>
+                  <div className="text-3xl font-bold">{formatSessionDuration(getAvgSessionDuration())}</div>
                   <p className="text-xs text-gray-500 mt-1">Average time spent on site</p>
                 </CardContent>
               </Card>
@@ -483,7 +413,7 @@ export default function AnalyticsPage() {
                   <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{`${getBounceRate(analyticsData)}%`}</div>
+                  <div className="text-3xl font-bold">{`${getBounceRate()}%`}</div>
                   <p className="text-xs text-gray-500 mt-1">Single page sessions</p>
                 </CardContent>
               </Card>
@@ -500,7 +430,7 @@ export default function AnalyticsPage() {
                 <CardContent>
                   <AreaChart
                     className="h-72"
-                    data={prepareVisitorChartData(analyticsData)}
+                    data={prepareVisitorChartData()}
                     index="date"
                     categories={["Page Views", "Unique Visitors", "New Visitors", "Returning Visitors"]}
                     colors={["blue", "indigo", "green", "purple"]}
@@ -521,7 +451,7 @@ export default function AnalyticsPage() {
                   <CardContent>
                     <DonutChart
                       className="h-60"
-                      data={prepareDeviceData(analyticsData)}
+                      data={prepareDeviceData()}
                       category="value"
                       index="name"
                       colors={Object.values(deviceColors)}
@@ -569,7 +499,7 @@ export default function AnalyticsPage() {
                   <CardContent>
                     <BarChart
                       className="h-60"
-                      data={prepareBrowserData(analyticsData)}
+                      data={prepareBrowserData()}
                       index="name"
                       categories={["value"]}
                       colors={["blue"]}
@@ -635,7 +565,7 @@ export default function AnalyticsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {prepareTopPagesData(analyticsData).map((page, index) => (
+                    {prepareTopPagesData().map((page: { title: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; path: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; views: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
                       <TableRow key={index}>
                         <TableCell>
                           <div className="font-medium">{page.title}</div>
@@ -644,7 +574,7 @@ export default function AnalyticsPage() {
                         <TableCell className="text-right">{page.views}</TableCell>
                       </TableRow>
                     ))}
-                    {prepareTopPagesData(analyticsData).length === 0 && (
+                    {prepareTopPagesData().length === 0 && (
                       <TableRow>
                         <TableCell colSpan={2} className="text-center py-4 text-gray-500">
                           No page view data available
@@ -693,7 +623,7 @@ export default function AnalyticsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {prepareTopCountriesData(analyticsData).map((country, index) => (
+                      {prepareTopCountriesData().map((country: { country: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; visitors: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
                         <TableRow key={index}>
                           <TableCell>
                             <div className="flex items-center">
@@ -704,7 +634,7 @@ export default function AnalyticsPage() {
                           <TableCell className="text-right">{country.visitors}</TableCell>
                         </TableRow>
                       ))}
-                      {prepareTopCountriesData(analyticsData).length === 0 && (
+                      {prepareTopCountriesData().length === 0 && (
                         <TableRow>
                           <TableCell colSpan={2} className="text-center py-4 text-gray-500">
                             No country data available
@@ -731,14 +661,14 @@ export default function AnalyticsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {prepareTopCitiesData(analyticsData).map((city, index) => (
+                      {prepareTopCitiesData().map((city: { city: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; country: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; visitors: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
                         <TableRow key={index}>
                           <TableCell>{city.city}</TableCell>
                           <TableCell>{city.country}</TableCell>
                           <TableCell className="text-right">{city.visitors}</TableCell>
                         </TableRow>
                       ))}
-                      {prepareTopCitiesData(analyticsData).length === 0 && (
+                      {prepareTopCitiesData().length === 0 && (
                         <TableRow>
                           <TableCell colSpan={3} className="text-center py-4 text-gray-500">
                             No city data available
