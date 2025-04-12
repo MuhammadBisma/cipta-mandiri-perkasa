@@ -367,7 +367,7 @@ export default function Testimonials() {
               <CheckCircle className="h-16 w-16 text-green-500" />
               <DialogTitle>Testimoni Terkirim!</DialogTitle>
               <DialogDescription className="text-base">
-                Terima kasih atas testimoni Anda. Testimoni akan ditampilkan setelah disetujui oleh admin.
+                Terima kasih atas testimoni Anda.
               </DialogDescription>
               <Button 
                 onClick={() => setIsSuccessOpen(false)} 

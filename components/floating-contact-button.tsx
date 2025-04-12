@@ -4,15 +4,26 @@ import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Phone, MessageCircle, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { usePathname } from "next/navigation"
 
 export default function FloatingContactButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const heroSectionRef = useRef<HTMLElement | null>(null)
+  const pathname = usePathname()
+
+  // Check if current page is admin page
+  const isAdminPage = pathname?.startsWith("/admin")
 
   // Find hero section and set up intersection observer
   useEffect(() => {
+    // If on admin page, don't show the button
+    if (isAdminPage) {
+      setIsVisible(false)
+      return
+    }
+
     const heroSection = document.getElementById("hero")
     heroSectionRef.current = heroSection
 
@@ -33,7 +44,7 @@ export default function FloatingContactButton() {
         observer.unobserve(heroSection)
       }
     }
-  }, [])
+  }, [isAdminPage])
 
   // Show popup every 3 seconds
   useEffect(() => {
@@ -44,9 +55,9 @@ export default function FloatingContactButton() {
         setShowPopup(true)
         setTimeout(() => {
           setShowPopup(false)
-        }, 2000) 
+        }, 2000)
       }
-    }, 3000) 
+    }, 3000)
 
     return () => clearInterval(interval)
   }, [isVisible, isOpen])
@@ -61,7 +72,7 @@ export default function FloatingContactButton() {
     setIsOpen(false)
   }
 
-  if (!isVisible) return null
+  if (!isVisible || isAdminPage) return null
 
   return (
     <div className="fixed bottom-6 right-6 z-50">

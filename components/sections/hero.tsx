@@ -95,91 +95,83 @@ export default function Hero() {
           </div>
 
           {/* Single set of text elements that animate between states */}
-          <div className="relative h-48 md:h-64 lg:h-80 mb-6 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={slides[currentSlide].id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="absolute top-0 left-0 w-full"
-              >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                  <span className="text-white drop-shadow-lg">
-                    {slides[currentSlide].title}
-                  </span>
-                  <br />
-                  <span className={`bg-clip-text text-transparent bg-gradient-to-r ${slides[currentSlide].highlightColor} drop-shadow-md`}>
-                    {slides[currentSlide].subtitle}
-                  </span>
-                </h1>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          
-          <div className="relative h-20 mb-10 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={slides[currentSlide].id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="absolute top-0 left-0 text-lg md:text-xl text-white max-w-2xl leading-relaxed"
-              >
-                <span className="bg-black/30 px-2 py-1 rounded-md backdrop-blur-sm">
-                  {slides[currentSlide].description}
-                </span>
-              </motion.p>
-            </AnimatePresence>
-          </div>
+<div className="relative h-48 md:h-64 lg:h-80 mb-6 overflow-hidden">
+  <AnimatePresence mode="wait">
+    <motion.div
+      key={slides[currentSlide].id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="absolute top-0 left-0 w-full"
+    >
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+        <span className="text-white drop-shadow-lg">
+          {slides[currentSlide].title}
+        </span>
+        <br />
+        <span 
+          className={`bg-clip-text text-transparent bg-gradient-to-r ${slides[currentSlide].highlightColor} drop-shadow-md animate-gradient bg-300%`}
+          style={{
+            backgroundSize: '300% 100%',
+            animation: 'gradient 8s ease infinite'
+          }}
+        >
+          {slides[currentSlide].subtitle}
+        </span>
+      </h1>
+    </motion.div>
+  </AnimatePresence>
+</div>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-16">
-            {isMobile ? (
-              <Button
-              onClick={openWhatsApp}
-              className="rounded-full px-6 py-5 text-base font-bold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg transition-all flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                viewBox="0 0 32 32"
-                fill="currentColor"
-              >
-                <path d="M16 0C7.2 0 0 6.9 0 15.3c0 2.7.7 5.3 2.1 7.5L0 32l9.4-2.4c2 .5 4 .8 6.1.8 8.8 0 16-6.9 16-15.3S24.8 0 16 0zm0 28.4c-1.8 0-3.5-.3-5.1-.8l-.4-.1-5.6 1.4 1.5-5.3-.3-.4c-1.3-1.9-2-4.2-2-6.6 0-6.6 5.6-11.9 12.5-11.9s12.5 5.3 12.5 11.9-5.6 11.9-12.5 11.9zm6.8-8.8c-.4-.2-2.5-1.2-2.9-1.3-.4-.2-.6-.2-.8.2-.2.4-.9 1.3-1.1 1.5-.2.2-.4.2-.8 0-.4-.2-1.5-.5-2.9-1.7-1.1-.9-1.8-2-2-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.6.1-.2.1-.4.2-.6 0-.2 0-.5-.1-.7-.2-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6-.2 0-.4 0-.6 0s-.6.1-.9.4c-.3.3-1.2 1.1-1.2 2.6s1.3 3 1.5 3.2c.2.2 2.5 3.9 6 5.4.8.3 1.5.5 2 .6.8.2 1.6.2 2.2.1.7-.1 2.5-1 2.9-2 .4-1 .4-1.8.3-2 0-.2-.3-.3-.7-.5z"/>
-              </svg>
-              Hubungi via WhatsApp
-            </Button>
-            
-            ) : (
-              <Button
-            onClick={openWhatsApp}
-            className="rounded-full px-6 py-5 text-base font-bold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg transition-all flex items-center"
-              >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                viewBox="0 0 32 32"
-                fill="currentColor"
-              >
-                <path d="M16 0C7.2 0 0 6.9 0 15.3c0 2.7.7 5.3 2.1 7.5L0 32l9.4-2.4c2 .5 4 .8 6.1.8 8.8 0 16-6.9 16-15.3S24.8 0 16 0zm0 28.4c-1.8 0-3.5-.3-5.1-.8l-.4-.1-5.6 1.4 1.5-5.3-.3-.4c-1.3-1.9-2-4.2-2-6.6 0-6.6 5.6-11.9 12.5-11.9s12.5 5.3 12.5 11.9-5.6 11.9-12.5 11.9zm6.8-8.8c-.4-.2-2.5-1.2-2.9-1.3-.4-.2-.6-.2-.8.2-.2.4-.9 1.3-1.1 1.5-.2.2-.4.2-.8 0-.4-.2-1.5-.5-2.9-1.7-1.1-.9-1.8-2-2-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.6.1-.2.1-.4.2-.6 0-.2 0-.5-.1-.7-.2-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6-.2 0-.4 0-.6 0s-.6.1-.9.4c-.3.3-1.2 1.1-1.2 2.6s1.3 3 1.5 3.2c.2.2 2.5 3.9 6 5.4.8.3 1.5.5 2 .6.8.2 1.6.2 2.2.1.7-.1 2.5-1 2.9-2 .4-1 .4-1.8.3-2 0-.2-.3-.3-.7-.5z"/>
-              </svg>
-              Hubungi via WhatsApp
-            </Button>
-            )}
-            <Link href="/gallery">
-              <Button
-                variant="outline"
-                className="rounded-full px-6 py-5 sm:px-8 sm:py-6 text-base font-medium border-2 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white hover:text-white transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/20 group"
-              >
-                <span className="relative z-10 flex items-center">
-                  Lihat Portofolio
-                  <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Button>
-            </Link>
-          </div>
+{/* Description with improved styling */}
+<div className="relative h-20 mb-10 overflow-hidden">
+  <AnimatePresence mode="wait">
+    <motion.p
+      key={slides[currentSlide].id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="absolute top-0 left-0 text-lg md:text-xl text-white max-w-2xl leading-relaxed"
+    >
+      <span className="bg-black/40 px-4 py-2 rounded-lg backdrop-blur-sm border border-white/10 shadow-lg">
+        {slides[currentSlide].description}
+      </span>
+    </motion.p>
+  </AnimatePresence>
+</div>
+
+          <div className="flex flex-col sm:flex-row gap-4 mb-16 w-full">
+  {/* WhatsApp Button - sekarang satu untuk semua ukuran */}
+  <Button
+    onClick={openWhatsApp}
+    className="rounded-full px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base font-bold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg transition-all flex items-center justify-center flex-1 w-full"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4 sm:h-5 sm:w-5 mr-2"
+      viewBox="0 0 32 32"
+      fill="currentColor"
+    >
+      <path d="M16 0C7.2 0 0 6.9 0 15.3c0 2.7.7 5.3 2.1 7.5L0 32l9.4-2.4c2 .5 4 .8 6.1.8 8.8 0 16-6.9 16-15.3S24.8 0 16 0zm0 28.4c-1.8 0-3.5-.3-5.1-.8l-.4-.1-5.6 1.4 1.5-5.3-.3-.4c-1.3-1.9-2-4.2-2-6.6 0-6.6 5.6-11.9 12.5-11.9s12.5 5.3 12.5 11.9-5.6 11.9-12.5 11.9zm6.8-8.8c-.4-.2-2.5-1.2-2.9-1.3-.4-.2-.6-.2-.8.2-.2.4-.9 1.3-1.1 1.5-.2.2-.4.2-.8 0-.4-.2-1.5-.5-2.9-1.7-1.1-.9-1.8-2-2-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.6.1-.2.1-.4.2-.6 0-.2 0-.5-.1-.7-.2-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6-.2 0-.4 0-.6 0s-.6.1-.9.4c-.3.3-1.2 1.1-1.2 2.6s1.3 3 1.5 3.2c.2.2 2.5 3.9 6 5.4.8.3 1.5.5 2 .6.8.2 1.6.2 2.2.1.7-.1 2.5-1 2.9-2 .4-1 .4-1.8.3-2 0-.2-.3-.3-.7-.5z"/>
+    </svg>
+    <span className="truncate">Hubungi via WhatsApp</span>
+  </Button>
+  
+  {/* Portfolio Button */}
+  <Link href="/gallery" className="flex-1 w-full">
+    <Button
+      variant="outline"
+      className="rounded-full w-full px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base font-medium border-2 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-blue-500/20 group"
+    >
+      <span className="relative z-10 flex items-center justify-center w-full">
+        <span className="truncate">Lihat Portofolio</span>
+        <ArrowRight className="ml-2 sm:ml-3 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+      </span>
+    </Button>
+  </Link>
+</div>
 
           {/* Centered Slide Indicators */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">

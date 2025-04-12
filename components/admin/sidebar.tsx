@@ -162,14 +162,14 @@ export default function Sidebar() {
           {/* Logo */}
           <div className="p-4 border-b">
             <Image
-              src="/logo.svg?height=12&width=180"
+              src="/logo.svg" 
               alt="Cipta Mandiri Perkasa Logo"
-              width={100}
-              height={12}
-              className="h-10 w-auto"
+              width={100}    
+              height={40}   
+              className="h-auto w-[180px]" 
+              priority       
             />
           </div>
-
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4">
             <motion.ul className="space-y-2" variants={itemVariants} initial="closed" animate="open">

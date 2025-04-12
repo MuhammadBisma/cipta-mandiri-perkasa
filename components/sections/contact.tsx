@@ -187,16 +187,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="text-lg font-medium mb-1">Alamat Kantor</h4>
-                    <p className="text-gray-600">Jl. Contoh No. 123, Kota, Provinsi, Indonesia</p>
-                    <a
-                      href="https://maps.google.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-primary hover:text-primary/80 mt-2 text-sm font-medium"
-                    >
-                      Lihat di Google Maps
-                      <ExternalLink className="ml-1 h-3 w-3" />
-                    </a>
+                    <p className="text-gray-600">Kp.pisang, batu, Jl. Raya Tambelang No.RT.02, Kertamukti, Kec. Cibitung, Kabupaten Bekasi, Jawa Barat 17520</p>
                   </div>
                 </div>
 
@@ -445,7 +436,7 @@ export default function Contact() {
           <div id="map-container" className="h-[500px] w-full bg-gray-100">
             {mapLoaded ? (
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2904357243586!2d106.8269113!3d-6.2297698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3f3a3a35c01%3A0x8c39d3d75d765d3c!2sMonumen%20Nasional!5e0!3m2!1sid!2sid!4v1649385929932!5m2!1sid!2sid"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2925248538536!2d107.11352067316736!3d-6.225107560963205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69854f9b8a9187%3A0x639e660cbd4dacdf!2sCipta%20Mandiri%20Perkasa!5e0!3m2!1sid!2sid!4v1744474838740!5m2!1sid!2sid"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Lock, User, AlertCircle } from "lucide-react"
+import { Lock, User, AlertCircle, Home } from "lucide-react"
 import Cookies from "js-cookie"
 
 export default function LoginPage() {
@@ -90,7 +90,7 @@ export default function LoginPage() {
                     id="username"
                     type="text"
                     placeholder="Username"
-                    className="pl-10"
+                    className="pl-10 rounded-xl"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -107,7 +107,7 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="Password"
-                    className="pl-10"
+                    className="pl-10 rounded-xl"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -116,7 +116,7 @@ export default function LoginPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full bg-primary" disabled={loading}>
+              <Button type="submit" className="w-full bg-primary rounded-xl" disabled={loading}>
                 {loading ? "Memproses..." : "Login"}
               </Button>
             </CardFooter>
@@ -126,6 +126,15 @@ export default function LoginPage() {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">Lupa password? Hubungi administrator sistem.</p>
         </div>
+        <Button 
+          type="button"
+          variant="outline"
+          className="w-full gap-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white hover:text-white border-blue-500"
+          onClick={() => router.push("/")}
+          >
+          <Home className="h-4 w-4" />
+          Kembali ke Beranda
+          </Button>
       </div>
     </main>
   )
