@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts     BlogPost[]
+  galleries Gallery[]
+  backups   Backup[]
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+model BlogPost {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  excerpt     String
+  content     String     @db.Text
+  imageUrl    String
+  category    String
+  published   Boolean    @default(false)
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  pageViews   PageView[]
+}
+
+model Gallery {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  imageUrl    String
+  category    String
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  pageViews   PageView[]
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  position  String?
+  message   String   @db.Text
+  rating    Float
+  imageUrl  String?
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Backup {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  filePath    String
+  fileSize    Int          // Size in bytes
+  fileType    String       // JSON, ZIP, etc.
+  tables      String[]     // Array of table names included in the backup
+  type        BackupType
+  status      BackupStatus
+  createdBy   User         @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@index([createdAt])
+}
+
+enum BackupType {
+  FULL
+  PARTIAL
+  MANUAL
+  SCHEDULED
+}
+
+enum BackupStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+model BackupSchedule {
+  id            String             @id @default(uuid())
+  enabled       Boolean            @default(true)
+  frequency     ScheduleFrequency
+  time          String             // Format: HH:MM
+  retentionDays Int                @default(30)
+  lastRun       DateTime?
+  nextRun       DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+enum ScheduleFrequency {
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+// Analytics models
+model Visitor {
+  id              String     @id @default(uuid())
+  ipAddress       String
+  userAgent       String?    @db.Text
+  browser         String
+  operatingSystem String
+  deviceType      String
+  country         String?
+  city            String?
+  region          String?
+  firstVisit      DateTime   @default(now())
+  lastVisit       DateTime   @default(now())
+  visitCount      Int        @default(1)
+  pageViews       PageView[]
+
+  @@index([ipAddress])
+  @@index([country])
+  @@index([city])
+  @@index([deviceType])
+  @@index([browser])
+}
+
+model PageView {
+  id          String    @id @default(uuid())
+  path        String
+  pageTitle   String?
+  referrer    String?
+  queryParams String?
+  timestamp   DateTime  @default(now())
+  duration    Int?      // Duration in seconds
+  visitor     Visitor   @relation(fields: [visitorId], references: [id])
+  visitorId   String
+  blogPost    BlogPost? @relation(fields: [blogPostId], references: [id])
+  blogPostId  String?
+  gallery     Gallery?  @relation(fields: [galleryId], references: [id])
+  galleryId   String?
+
+  @@index([timestamp])
+  @@index([path])
+  @@index([visitorId])
+  @@index([blogPostId])
+  @@index([galleryId])
+}
+
+model DailyAnalytics {
+  id                String   @id @default(uuid())
+  date              DateTime @unique
+  pageViews         Int
+  uniqueVisitors    Int
+  newVisitors       Int
+  returningVisitors Int
+  avgSessionDuration Int
+  bounceRate        Float
+  topPages          String   @db.Text // JSON string
+  topCountries      String   @db.Text // JSON string
+  topReferrers      String   @db.Text // JSON string
+
+  @@index([date])
+}

@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #0056b3;
+  --primary-light: #0077cc;
+  --secondary: #ffc107;
+  --secondary-light: #ffca28;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.section-padding {
+  @apply py-16 md:py-24;
+}
+
+.container {
+  @apply px-4 mx-auto max-w-7xl;
+}
+
+.heading-primary {
+  @apply text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-6;
+}
+
+.heading-secondary {
+  @apply text-2xl md:text-3xl font-bold text-primary mb-4;
+}
+
+.heading-tertiary {
+  @apply text-xl md:text-2xl font-semibold text-primary mb-3;
+}
+
+.btn-primary {
+  @apply bg-primary hover:bg-primary-light text-white font-medium py-2 px-6 rounded-md transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply bg-secondary hover:bg-secondary-light text-foreground font-medium py-2 px-6 rounded-md transition-all duration-300;
+}
+
+.btn-outline {
+  @apply border border-primary text-primary hover:bg-primary hover:text-white font-medium py-2 px-6 rounded-md transition-all duration-300;
+}
+
+/* Tambahkan ini di file CSS global Anda */
+@layer components {
+  .select-content {
+    @apply bg-white border border-gray-200 rounded-md shadow-lg;
+  }
+  .select-item {
+    @apply hover:bg-gray-100 cursor-pointer;
+  }
+}
