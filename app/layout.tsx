@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import Script from "next/script"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import PageViewTracker from "@/components/analytics/page-view-tracker"
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -49,17 +50,33 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Cipta Mandiri Perkasa",
-              url: "https://ciptamandiriperkasa.com",
-              logo: "https://ciptamandiriperkasa.com/images/logo.png",
+              url: "https://kubahcmp.id",
+              logo: "https://kubahcmp.id/images/logo.png",
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+6281234567890",
+                telephone: "+6281510655126",
                 contactType: "customer service",
               },
             }),
           }}
         />
       </head>
+
+      {/* 🔹 Google Analytics 4 */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-7XSRQ63SM1"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7XSRQ63SM1', {
+            page_path: window.location.pathname,
+          });
+        `}
+      </Script>
 
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
@@ -71,6 +88,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-
-import './globals.css'

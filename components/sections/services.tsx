@@ -74,7 +74,7 @@ export default function Services() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
+          {services.slice(0, 3).map((service, index) => (
             <div
               key={index}
               className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-2"
@@ -99,10 +99,10 @@ export default function Services() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link href="/services">
-            <Button className="btn-primary rounded-xl">Lihat Semua Layanan</Button>
-          </Link>
-        </div>
+        <Link href="/services">
+          <Button className="btn-primary rounded-xl">Lihat Semua Layanan</Button>
+        </Link>
+      </div>
       </div>
     </section>
   )

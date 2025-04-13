@@ -43,33 +43,37 @@ export default function Navbar() {
     setActiveSubmenu(activeSubmenu === name ? null : name)
   }
 
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-        scrolled 
-          ? "bg-white/95 backdrop-blur-md shadow-sm py-2" 
-          : "bg-transparent py-4"
-      }`}
-    >
-      <div className="container mx-auto px-4 flex justify-between items-center">
-      <Link href="/" className="flex items-center hover:scale-105 transition-transform duration-200">
-  {/* Logo diperbesar */}
-  <div className="flex-shrink-0">
-    <Image
-      src={scrolled ? "/logo.svg" : "/logo.svg"}
-      alt="Cipta Mandiri Perkasa Logo"
-      width={50} 
-      height={50}
-      className="h-12 w-auto" 
-      priority
-    />
-  </div>
-  
-      <span className="ml-2 font-semibold text-[18px]">
-    <span className="text-blue-600">Cipta Mandiri</span>{' '}
-  <span className="text-yellow-500">Perkasa</span>
-</span>
-  </Link>
+      return (
+        <header
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+            scrolled 
+              ? "bg-white/95 backdrop-blur-md shadow-sm py-2" 
+              : "bg-transparent py-4"
+          }`}
+        >
+          <div className="container mx-auto px-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center hover:scale-105 transition-transform duration-200">
+      {/* Logo diperbesar */}
+      <div className="flex-shrink-0">
+        <Image
+          src={scrolled ? "/logo.svg" : "/logo.svg"}
+          alt="Cipta Mandiri Perkasa Logo"
+          width={50} 
+          height={50}
+          className="h-12 w-auto" 
+          priority
+        />
+        </div>
+        <div className="flex flex-col">
+        <span className="ml-2 font-semibold text-[18px] leading-tight">
+          <span className="text-blue-600">Cipta Mandiri</span>{' '}
+          <span className="text-yellow-500">Perkasa</span>
+        </span>
+        <span className="ml-2 text-[10px] text-gray-500 leading-tight">
+          Glassfibre Reinforced Cement Interior & Exterior Finishing
+        </span>
+      </div>
+      </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-2">
@@ -128,23 +132,22 @@ export default function Navbar() {
           ))}
           
           <Link href="/login">
-  <Button 
-    className={`ml-4 group relative overflow-hidden transition-all duration-300 rounded-full px-6 h-10 ${
-      scrolled ? "bg-blue-600 text-white" : "bg-transparent text-white border border-white"
-    }`}
-  >
-    <span className="absolute inset-0 w-0 bg-white/10 transition-all duration-300 group-hover:w-full rounded-full"></span>
-    <span className="relative flex items-center">
-      <User size={16} className="mr-2" />
-      <span>Login</span>
-      <ArrowRight 
-        size={16} 
-        className="ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0" 
-      />
-    </span>
-  </Button>
-</Link>
-
+          <Button 
+            className={`ml-4 group relative overflow-hidden transition-all duration-300 rounded-full px-6 h-10 ${
+              scrolled ? "bg-blue-600 text-white" : "bg-transparent text-white border border-white"
+            }`}
+          >
+            <span className="absolute inset-0 w-0 bg-white/10 transition-all duration-300 group-hover:w-full rounded-full"></span>
+            <span className="relative flex items-center">
+              <User size={16} className="mr-2" />
+              <span>Login</span>
+              <ArrowRight 
+                size={16} 
+                className="ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0" 
+              />
+            </span>
+          </Button>
+        </Link>
         </nav>
 
         {/* Mobile Navigation Toggle */}

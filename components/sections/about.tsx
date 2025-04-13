@@ -165,48 +165,48 @@ export default function About() {
 
             {/* Timeline Items */}
             <div className="space-y-12">
-              {timelineItems.map((item, index) => (
-                <motion.div
-                  key={index}
-                  className={`relative flex items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                  transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                >
-                  <div className="flex-1 md:pr-12 md:pl-0 pl-12">
-                    <div
-                      className={`bg-white p-6 rounded-lg shadow-md border-l-4 ${
-                        index % 2 === 0 ? "md:text-right border-primary" : "border-secondary"
-                      } hover:shadow-lg transition-shadow duration-300 relative`}
-                    >
-                      {/* Connecting line from card to timeline */}
-                      <div
-                        className={`absolute top-1/2 -translate-y-1/2 h-0.5 bg-gradient-to-r ${
-                          index % 2 === 0
-                            ? "right-0 translate-x-full from-primary to-transparent md:w-12"
-                            : "left-0 -translate-x-full from-transparent to-secondary md:w-12"
-                        } hidden md:block`}
-                      ></div>
-
-                      <span className="text-secondary font-bold">{item.year}</span>
-                      <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
-                      <p className="text-gray-600">{item.description}</p>
-                    </div>
-                  </div>
-
-                  {/* Timeline Dot with connecting lines */}
-                  <motion.div
-                    className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2 top-1/2 w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center shadow-md z-10"
-                    whileHover={{ scale: 1.2 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            {timelineItems.map((item, index) => (
+              <motion.div
+                key={index}
+                className={`relative flex items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
+              >
+                <div className={`flex-1 ${index % 2 === 0 ? "md:pr-12" : "md:pl-12"} ${index % 2 !== 0 ? "md:pr-12" : "md:pl-12"} pl-12`}>
+                  <div
+                    className={`bg-white p-6 rounded-lg shadow-md border-l-4 ${
+                      index % 2 === 0 ? "md:text-right border-primary" : "border-secondary"
+                    } hover:shadow-lg transition-shadow duration-300 relative`}
                   >
-                    <div className="w-4 h-4 rounded-full bg-white"></div>
-                  </motion.div>
+                    {/* Connecting line from card to timeline */}
+                    <div
+                      className={`absolute top-1/2 -translate-y-1/2 h-0.5 bg-gradient-to-r ${
+                        index % 2 === 0
+                          ? "right-0 translate-x-full from-primary to-transparent md:w-12"
+                          : "left-0 -translate-x-full from-transparent to-secondary md:w-12"
+                      } hidden md:block`}
+                    ></div>
 
-                  <div className="flex-1 hidden md:block"></div>
+                    <span className="text-secondary font-bold">{item.year}</span>
+                    <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
+                    <p className="text-gray-600">{item.description}</p>
+                  </div>
+                </div>
+
+                {/* Timeline Dot with connecting lines */}
+                <motion.div
+                  className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2 top-1/2 w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center shadow-md z-10"
+                  whileHover={{ scale: 1.2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <div className="w-4 h-4 rounded-full bg-white"></div>
                 </motion.div>
-              ))}
-            </div>
+
+                <div className="flex-1 hidden md:block"></div>
+              </motion.div>
+            ))}
+          </div>
           </div>
         </div>
       </div>

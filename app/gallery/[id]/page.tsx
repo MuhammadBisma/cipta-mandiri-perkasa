@@ -123,15 +123,25 @@ export default async function GalleryItemPage({ params }: Props) {
                   kompetitif.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <Link href="/#contact">
-                    <Button className="bg-primary rounded-xl">Hubungi Kami</Button>
-                  </Link>
-                  <Link href={`/services/${galleryItem.category}`}>
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-xl">
-                      Lihat Layanan {galleryItem.category.charAt(0).toUpperCase() + galleryItem.category.slice(1)}
-                    </Button>
-                  </Link>
-                </div>
+                <Link href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer">
+                  <Button className="bg-green-600 hover:bg-green-700 rounded-xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 sm:h-5 sm:w-5 mr-2"
+                    viewBox="0 0 32 32"
+                    fill="currentColor"
+                  >
+                    <path d="M16 0C7.2 0 0 6.9 0 15.3c0 2.7.7 5.3 2.1 7.5L0 32l9.4-2.4c2 .5 4 .8 6.1.8 8.8 0 16-6.9 16-15.3S24.8 0 16 0zm0 28.4c-1.8 0-3.5-.3-5.1-.8l-.4-.1-5.6 1.4 1.5-5.3-.3-.4c-1.3-1.9-2-4.2-2-6.6 0-6.6 5.6-11.9 12.5-11.9s12.5 5.3 12.5 11.9-5.6 11.9-12.5 11.9zm6.8-8.8c-.4-.2-2.5-1.2-2.9-1.3-.4-.2-.6-.2-.8.2-.2.4-.9 1.3-1.1 1.5-.2.2-.4.2-.8 0-.4-.2-1.5-.5-2.9-1.7-1.1-.9-1.8-2-2-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.6.1-.2.1-.4.2-.6 0-.2 0-.5-.1-.7-.2-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6-.2 0-.4 0-.6 0s-.6.1-.9.4c-.3.3-1.2 1.1-1.2 2.6s1.3 3 1.5 3.2c.2.2 2.5 3.9 6 5.4.8.3 1.5.5 2 .6.8.2 1.6.2 2.2.1.7-.1 2.5-1 2.9-2 .4-1 .4-1.8.3-2 0-.2-.3-.3-.7-.5z"/>
+                  </svg>
+                    Hubungi Kami via WA
+                  </Button>
+                </Link>
+                <Link href={`/services/${galleryItem.category}`}>
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-xl">
+                    Lihat Layanan {galleryItem.category.charAt(0).toUpperCase() + galleryItem.category.slice(1)}
+                  </Button>
+                </Link>
+              </div>
               </div>
             </div>
           </div>
