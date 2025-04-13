@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   description:
     "Cipta Mandiri Perkasa adalah perusahaan spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
-  keywords: ["kubah masjid", "mimbar masjid", "menara masjid", "kerawangan", "awan kaligrafi", "ornamen islami"],
+  keywords: ["kubah masjid", "mimbar masjid", "menara masjid", "kerawangan", "awan kaligrafi", "ornamen islami", "kubah masjid murah", "mimbar masjid murah", "menara masjid murah", "kerawangan murah", "awan kaligrafi murah", "ornamen islami murah", "pembuatan masjid modern murah", "pembuatan masjid minimalis murah", "kubah masjid modern"],
   authors: [{ name: "Cipta Mandiri Perkasa" }],
   creator: "Cipta Mandiri Perkasa",
   publisher: "Cipta Mandiri Perkasa",
