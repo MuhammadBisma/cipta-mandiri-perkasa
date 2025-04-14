@@ -159,6 +159,7 @@ export default function Gallery() {
                   alt={selectedItem.title}
                   fill
                   className="object-contain"
+                  loading="lazy"
                 />
               </div>
               <div className="p-4 bg-white">

@@ -75,7 +75,12 @@ export default function BlogPreview() {
                 className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-2"
               >
                 <div className="relative h-48">
-                  <Image src={post.imageUrl || "/placeholder.svg"} alt={post.title} fill className="object-cover" />
+                  <Image 
+                  src={post.imageUrl || "/placeholder.svg"} 
+                  alt={post.title} 
+                  fill 
+                  loading="lazy"
+                  className="object-cover" />
                 </div>
                 <div className="p-6">
                   <div className="flex items-center text-sm text-gray-500 mb-3">

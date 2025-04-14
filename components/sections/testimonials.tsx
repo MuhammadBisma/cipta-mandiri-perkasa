@@ -216,6 +216,7 @@ export default function Testimonials() {
                           src={testimonial.imageUrl || "/placeholder.svg"}
                           alt={testimonial.name}
                           fill
+                          loading="lazy"
                           className="rounded-full object-cover border-2 border-primary/20"
                         />
                       </div>
