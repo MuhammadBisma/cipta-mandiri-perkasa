@@ -12,12 +12,12 @@ const navLinks = [
   { name: "Layanan", href: "/#services",
     subLinks: [
       { name: "Masjid", href: "/services/masjid" },
-      { name: "Kubah Masjid", href: "/services/kubah-masjid" },
-      { name: "Mimbar Masjid", href: "/services/mimbar-masjid" },
-      { name: "Menara Masjid", href: "/services/menara-masjid" },
+      { name: "Kubah Masjid", href: "/services/kubah" },
+      { name: "Mimbar Masjid", href: "/services/mimbar" },
+      { name: "Menara Masjid", href: "/services/menara" },
       { name: "Kerawangan", href: "/services/kerawangan" },
-      { name: "Ornamen Masjid", href: "/services/ornamen-masjid" },
-      { name: "Awan Kaligrafi", href: "/services/awan-kaligrafi" }
+      { name: "Ornamen Masjid", href: "/services/ornamen" },
+      { name: "Awan Kaligrafi", href: "/services/kaligrafi" }
     ]
   },
   { name: "Galeri", href: "/gallery" },
