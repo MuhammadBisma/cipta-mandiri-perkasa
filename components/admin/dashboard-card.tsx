@@ -4,15 +4,16 @@ import { motion } from "framer-motion"
 import type { ReactNode } from "react"
 
 interface DashboardCardProps {
-  title: string
-  value: number
-  icon: ReactNode
-  description: string
-  color: string
-  index: number
-  badge?: string
-  isAnimating?: boolean
-  onClick?: () => void
+  title: string;
+  value: number;
+  icon: ReactNode;
+  description: string;
+  color: string;
+  index: number;
+  badge?: string;
+  isAnimating?: boolean;
+  onClick?: () => void;
+  className?: string; 
 }
 
 export default function DashboardCard({

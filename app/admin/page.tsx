@@ -74,15 +74,22 @@ interface Testimonial {
   updatedAt: string
 }
 
-// Warna untuk chart layanan
-const serviceColors = ["indigo", "cyan", "emerald", "amber", "rose", "blue", "green", "yellow", "red", "purple"]
+interface ServiceData {
+  name: string
+  value: number
+  color: string
+  path: string
+}
+
+// Define service colors - one for each service
+const serviceColors = ["indigo", "cyan", "emerald", "amber", "rose", "blue", "purple", "green", "yellow", "red"]
 
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [realTimeVisitors, setRealTimeVisitors] = useState<RealTimeVisitor[]>([])
   const [visitorChartData, setVisitorChartData] = useState<any[]>([])
-  const [serviceData, setServiceData] = useState<any[]>([])
+  const [serviceData, setServiceData] = useState<ServiceData[]>([])
   const [activities, setActivities] = useState<Activity[]>([])
   const [pendingTestimonials, setPendingTestimonials] = useState<Testimonial[]>([])
   const [loading, setLoading] = useState(true)
@@ -115,11 +122,50 @@ export default function AdminDashboard() {
         throw new Error("Failed to fetch pending testimonials")
       }
       const data = await res.json()
-      setPendingTestimonials(data)
-      return data.length
+      setPendingTestimonials(data.testimonials || [])
+      return data.testimonials?.length || 0
     } catch (err) {
       console.error("Error fetching pending testimonials:", err)
       return 0
+    }
+  }
+
+  // Function to fetch popular services
+  const fetchPopularServices = async () => {
+    try {
+      const startDate = format(subDays(new Date(), 30), "yyyy-MM-dd")
+      const endDate = format(new Date(), "yyyy-MM-dd")
+
+      const res = await fetch(`/api/analytics/popular-services?startDate=${startDate}&endDate=${endDate}&limit=7`)
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch popular services")
+      }
+
+      const data = await res.json()
+
+      if (data.success && Array.isArray(data.services)) {
+        setServiceData(data.services)
+        return data.services
+      } else {
+        throw new Error("Invalid response format")
+      }
+    } catch (err) {
+      console.error("Error fetching popular services:", err)
+
+      // Return default data in case of error
+      const defaultServices = [
+        { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah-masjid" },
+        { name: "Mimbar", value: 38, color: serviceColors[1], path: "/services/mimbar" },
+        { name: "Menara", value: 32, color: serviceColors[2], path: "/services/menara" },
+        { name: "Kerawangan", value: 28, color: serviceColors[3], path: "/services/kerawangan" },
+        { name: "Kaligrafi", value: 25, color: serviceColors[4], path: "/services/kaligrafi" },
+        { name: "Ornamen", value: 20, color: serviceColors[5], path: "/services/ornamen" },
+        { name: "Pintu", value: 15, color: serviceColors[6], path: "/services/pintu" },
+      ]
+
+      setServiceData(defaultServices)
+      return defaultServices
     }
   }
 
@@ -157,6 +203,9 @@ export default function AdminDashboard() {
       // Fetch pending testimonials
       const pendingCount = await fetchPendingTestimonials()
 
+      // Fetch popular services
+      await fetchPopularServices()
+
       // Set dashboard data
       setData({
         blogCount: blogData.length || 0,
@@ -188,51 +237,6 @@ export default function AdminDashboard() {
       }
 
       setVisitorChartData(chartData)
-
-      // Generate service data from top pages
-      let serviceStats = []
-
-      if (analytics.topPages && Array.isArray(analytics.topPages) && analytics.topPages.length > 0) {
-        // Filter for service pages
-        const servicePages = analytics.topPages
-          .filter((page: any) => page.path && page.path.startsWith("/services/"))
-          .slice(0, 5)
-
-        if (servicePages.length > 0) {
-          serviceStats = servicePages.map((page: any, index: number) => {
-            const serviceName = page.path.split("/").pop()
-            const formattedName = serviceName
-              ? serviceName.charAt(0).toUpperCase() + serviceName.slice(1).replace(/-/g, " ")
-              : "Unknown"
-
-            return {
-              name: formattedName,
-              value: page._count?.path || 0,
-              color: serviceColors[index % serviceColors.length],
-            }
-          })
-        }
-      }
-
-      // If we don't have enough service data, add some defaults
-      if (serviceStats.length < 5) {
-        const defaults = [
-          { name: "Kubah Masjid", value: 45, color: serviceColors[0] },
-          { name: "Mimbar", value: 20, color: serviceColors[1] },
-          { name: "Menara", value: 15, color: serviceColors[2] },
-          { name: "Kerawangan", value: 10, color: serviceColors[3] },
-          { name: "Kaligrafi", value: 10, color: serviceColors[4] },
-        ]
-
-        // Add defaults that aren't already in serviceStats
-        const existingNames = serviceStats.map((s: any) => s.name)
-        const missingDefaults = defaults.filter((d) => !existingNames.includes(d.name))
-
-        // Add enough missing defaults to reach 5 items
-        serviceStats.push(...missingDefaults.slice(0, 5 - serviceStats.length))
-      }
-
-      setServiceData(serviceStats)
 
       // Generate recent activities
       const recentActivities: Activity[] = []
@@ -295,13 +299,19 @@ export default function AdminDashboard() {
 
       // Set fallback data for charts
       setVisitorChartData(generateMockVisitorData())
-      setServiceData([
-        { name: "Kubah Masjid", value: 45, color: serviceColors[0] },
-        { name: "Mimbar", value: 20, color: serviceColors[1] },
-        { name: "Menara", value: 15, color: serviceColors[2] },
-        { name: "Kerawangan", value: 10, color: serviceColors[3] },
-        { name: "Kaligrafi", value: 10, color: serviceColors[4] },
-      ])
+
+      // Set fallback data for services
+      const defaultServices = [
+        { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah-masjid" },
+        { name: "Mimbar", value: 38, color: serviceColors[1], path: "/services/mimbar" },
+        { name: "Menara", value: 32, color: serviceColors[2], path: "/services/menara" },
+        { name: "Kerawangan", value: 28, color: serviceColors[3], path: "/services/kerawangan" },
+        { name: "Kaligrafi", value: 25, color: serviceColors[4], path: "/services/kaligrafi" },
+        { name: "Ornamen", value: 20, color: serviceColors[5], path: "/services/ornamen" },
+        { name: "Pintu", value: 15, color: serviceColors[6], path: "/services/pintu" },
+      ]
+
+      setServiceData(defaultServices)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -357,7 +367,11 @@ export default function AdminDashboard() {
                 ])
               }
             })
-          } else if (data.type === "approved_testimonial" || data.type === "rejected_testimonial") {
+          } else if (
+            data.type === "testimonial_approved" ||
+            data.type === "testimonial_rejected" ||
+            data.type === "testimonial_deleted"
+          ) {
             // Update pending testimonials count
             fetchPendingTestimonials().then((count) => {
               setData((prev) => (prev ? { ...prev, pendingTestimonialCount: count } : null))
@@ -380,14 +394,20 @@ export default function AdminDashboard() {
                 setActivities((prev) => prev.filter((a) => a.id !== "pending-testimonials"))
               }
 
-              // Add approval/rejection activity
-              const actionType = data.type === "approved_testimonial" ? "disetujui" : "ditolak"
-              const icon =
-                data.type === "approved_testimonial" ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                ) : (
-                  <XCircle className="h-4 w-4 text-red-500" />
-                )
+              // Add approval/rejection/deletion activity
+              let actionType = "diproses"
+              let icon = <Bell className="h-4 w-4 text-blue-500" />
+
+              if (data.type === "testimonial_approved") {
+                actionType = "disetujui"
+                icon = <CheckCircle className="h-4 w-4 text-green-500" />
+              } else if (data.type === "testimonial_rejected") {
+                actionType = "ditolak"
+                icon = <XCircle className="h-4 w-4 text-red-500" />
+              } else if (data.type === "testimonial_deleted") {
+                actionType = "dihapus"
+                icon = <AlertTriangle className="h-4 w-4 text-amber-500" />
+              }
 
               setActivities((prev) => [
                 {
@@ -462,6 +482,13 @@ export default function AdminDashboard() {
     router.push("/admin/testimonials")
   }
 
+  // Navigate to service page when clicking on a service in the chart
+  const handleServiceClick = (service: ServiceData) => {
+    if (service.path) {
+      window.open(service.path, "_blank")
+    }
+  }
+
   // Generate website stats
   const websiteStats = [
     {
@@ -523,42 +550,55 @@ export default function AdminDashboard() {
         </motion.div>
       )}
 
+      {/* Equal-sized dashboard cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard
-          title="Blog Posts"
-          value={data?.blogCount || 0}
-          icon={<FileText className="h-8 w-8" />}
-          description="Total artikel blog"
-          color="blue"
-          index={0}
-        />
-        <DashboardCard
-          title="Gallery Items"
-          value={data?.galleryCount || 0}
-          icon={<ImageIcon className="h-8 w-8" />}
-          description="Total item galeri"
-          color="green"
-          index={1}
-        />
-        <DashboardCard
-          title="Testimonials"
-          value={data?.testimonialCount || 0}
-          icon={<MessageSquare className="h-8 w-8" />}
-          description="Total testimoni"
-          color="yellow"
-          index={2}
-        />
-        <DashboardCard
-          title="Pending Approvals"
-          value={data?.pendingTestimonialCount || 0}
-          icon={<Users className="h-8 w-8" />}
-          description="Testimoni menunggu persetujuan"
-          color="red"
-          index={3}
-          badge={newTestimonialAlert ? "Baru!" : undefined}
-          isAnimating={newTestimonialAlert}
-          onClick={goToTestimonials}
-        />
+        <div className="h-full">
+          <DashboardCard
+            title="Blog Posts"
+            value={data?.blogCount || 0}
+            icon={<FileText className="h-8 w-8" />}
+            description="Total artikel blog"
+            color="blue"
+            index={0}
+            className="h-full"
+          />
+        </div>
+        <div className="h-full">
+          <DashboardCard
+            title="Gallery Items"
+            value={data?.galleryCount || 0}
+            icon={<ImageIcon className="h-8 w-8" />}
+            description="Total item galeri"
+            color="green"
+            index={1}
+            className="h-full"
+          />
+        </div>
+        <div className="h-full">
+          <DashboardCard
+            title="Testimonials"
+            value={data?.testimonialCount || 0}
+            icon={<MessageSquare className="h-8 w-8" />}
+            description="Total testimoni"
+            color="yellow"
+            index={2}
+            className="h-full"
+          />
+        </div>
+        <div className="h-full">
+          <DashboardCard
+            title="Pending Approvals"
+            value={data?.pendingTestimonialCount || 0}
+            icon={<Users className="h-8 w-8" />}
+            description="Testimoni menunggu persetujuan"
+            color="red"
+            index={3}
+            badge={newTestimonialAlert ? "Baru!" : undefined}
+            isAnimating={newTestimonialAlert}
+            onClick={goToTestimonials}
+            className="h-full"
+          />
+        </div>
       </div>
 
       {pendingTestimonials.length > 0 && (
@@ -685,18 +725,43 @@ export default function AdminDashboard() {
           <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
             <CardContent className="pt-6">
               <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
-              <BarChart
-                className="h-72"
-                data={serviceData}
-                index="name"
-                categories={["value"]}
-                colors={serviceData.map((item) => item.color)}
-                valueFormatter={(number) => `${number} kunjungan`}
-                showLegend={false}
-                showAnimation
-                layout="vertical"
-                yAxisWidth={120}
-              />
+              {serviceData.length > 0 ? (
+                <div className="h-80">
+                  <BarChart
+                    className="h-80"
+                    data={serviceData}
+                    index="name"
+                    categories={["value"]}
+                    colors={serviceData.map((item) => item.color)}
+                    valueFormatter={(number) => `${number} kunjungan`}
+                    showLegend={false}
+                    showAnimation
+                    layout="vertical"
+                    yAxisWidth={120}
+                  />
+                </div>
+              ) : (
+                <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg">
+                  <p className="text-gray-500">Tidak ada data layanan tersedia</p>
+                </div>
+              )}
+              {/* Service legend */}
+              {serviceData.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {serviceData.map((service, index) => (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start hover:bg-gray-100"
+                      onClick={() => handleServiceClick(service)}
+                    >
+                      <div className={`w-3 h-3 rounded-full bg-${service.color}-500 mr-2`}></div>
+                      <span className="truncate">{service.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>

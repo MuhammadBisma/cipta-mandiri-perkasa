@@ -6,6 +6,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import PageViewTracker from "@/components/analytics/page-view-tracker"
 import FloatingContactButton from "@/components/floating-contact-button"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -36,13 +37,10 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        {/* 🔹 Favicon */}
         <link rel="icon" href="/icons/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
-
-        {/* 🔹 JSON-LD untuk SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -61,8 +59,6 @@ export default function RootLayout({
           }}
         />
       </head>
-
-      {/* 🔹 Google Analytics 4 */}
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-7XSRQ63SM1"
         strategy="afterInteractive"
@@ -77,11 +73,12 @@ export default function RootLayout({
           });
         `}
       </Script>
-
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
+          <Suspense fallback={null}>
           <PageViewTracker />
+          </Suspense>
           <FloatingContactButton />
         </ThemeProvider>
       </body>

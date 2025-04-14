@@ -179,3 +179,8 @@ h1 {
 .animate-gradient {
   animation: gradient 8s ease infinite;
 }
+
+/* styles/globals.css */
+html, body {
+  overflow-x: hidden;
+}

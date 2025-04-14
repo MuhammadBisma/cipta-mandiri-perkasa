@@ -105,11 +105,13 @@ export default function BlogPreview() {
           </div>
         )}
 
-        <div className="mt-10 text-center">
-          <Link href="/blog">
-            <Button className="btn-primary rounded-xl">Lihat Semua Artikel</Button>
-          </Link>
-        </div>
+<div className="mt-10 text-center">
+  <Link href="/blog">
+    <Button className="rounded-xl px-6 py-3 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1">
+      Lihat Semua Artikel
+    </Button>
+  </Link>
+</div>
       </div>
     </section>
   )

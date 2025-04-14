@@ -83,15 +83,15 @@ export default function BlogSidebar() {
         <CardContent className="p-4">
           <h3 className="text-lg font-semibold mb-3">Cari Artikel</h3>
           <form onSubmit={handleSearch} className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Kata kunci..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" size="icon">
-              <Search className="h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Kata kunci..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 rounded-xl placeholder-transparent border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+            <Button type="submit" size="icon" className="rounded-full">
+              <Search className="h-4 w-4 rounded-xl" />
             </Button>
           </form>
         </CardContent>

@@ -71,6 +71,15 @@ export default async function BlogPage({
           <p className="text-lg text-white/80 max-w-3xl">
             Temukan informasi dan inspirasi seputar arsitektur islami dan ornamen masjid.
           </p>
+          {/* Tombol Kembali */}
+                      <Link href="/#blog">
+                        <Button 
+                          variant="outline" 
+                          className="rounded-xl bg-white text-primary hover:bg-white/90 hover:text-primary/90 transition-colors"
+                        >
+                          Kembali ke Beranda
+                        </Button>
+                      </Link>
         </div>
       </section>
 

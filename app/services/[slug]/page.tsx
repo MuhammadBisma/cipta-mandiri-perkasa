@@ -83,7 +83,7 @@ export default function ServicePage({ params }: Props) {
               <Link href="/services">
                 <Button
                   variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-xl"
+                  className="rounded-xl bg-white text-primary hover:bg-white/90 hover:text-primary/90 transition-colors"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" /> Kembali ke Layanan
                 </Button>
@@ -181,7 +181,8 @@ export default function ServicePage({ params }: Props) {
                 </Button>
               </Link>
               <Link href="/gallery">
-                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-[12px]">
+                <Button variant="outline" 
+                className="border-primary bg-primary text-white hover:bg-blue hover:text-white rounded-[12px]">
                   Lihat Portofolio
                 </Button>
               </Link>

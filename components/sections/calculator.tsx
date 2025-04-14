@@ -12,7 +12,7 @@ export default function Calculator() {
           </p>
         </div>
 
-        <ServiceCalculator serviceType="kubah-masjid" />
+        <ServiceCalculator serviceType="kubah" />
       </div>
     </section>
   )

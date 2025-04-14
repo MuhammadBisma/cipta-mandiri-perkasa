@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -15,13 +15,86 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import ExportAnalyticsButton from "@/components/analytics/export-analytics-button"
 
+// Define types for analytics data
+interface AnalyticsData {
+  dailyAnalytics?: DailyAnalytic[]
+  totalPageViews?: number
+  uniqueVisitors?: number
+  topPages?: TopPage[]
+  topCountries?: TopCountry[]
+  topCities?: TopCity[]
+  deviceBreakdown?: DeviceBreakdown[]
+  browserBreakdown?: BrowserBreakdown[]
+}
+
+interface DailyAnalytic {
+  date: string
+  pageViews: number
+  uniqueVisitors: number
+}
+
+interface TopPage {
+  path: string
+  pageTitle?: string
+  _count: { path: number }
+}
+
+interface TopCountry {
+  country: string
+  _count: { id: number }
+}
+
+interface TopCity {
+  city: string
+  country: string
+  _count: { id: number }
+}
+
+interface DeviceBreakdown {
+  deviceType: string
+  _count: { id: number }
+}
+
+interface BrowserBreakdown {
+  browser: string
+  _count: { id: number }
+}
+
+interface RealTimeVisitor {
+  id: string
+  country: string
+  city: string
+  browser: string
+  device: string
+  currentPage: string
+  lastActive: string
+}
+
+interface ChartDataPoint {
+  date: string
+  [key: string]: string | number
+}
+
+interface TooltipProps {
+  payload?: {
+    payload: {
+      [key: string]: string | number
+    }
+    color: string
+    name: string
+    value: number
+  }[]
+  label?: string
+  active?: boolean
+}
+
 export default function AnalyticsPage() {
   const [startDate, setStartDate] = useState<Date>(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
   const [endDate, setEndDate] = useState<Date>(new Date())
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [analyticsData, setAnalyticsData] = useState<any>(null)
-  const [realTimeVisitors, setRealTimeVisitors] = useState<any[]>([])
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
+  const [realTimeVisitors, setRealTimeVisitors] = useState<RealTimeVisitor[]>([])
   const [activeTab, setActiveTab] = useState("overview")
   const { toast } = useToast()
 
@@ -107,6 +180,7 @@ export default function AnalyticsPage() {
   // Initial data fetch
   useEffect(() => {
     fetchAnalytics()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate])
 
   // Fetch real-time visitors when on the real-time tab
@@ -127,27 +201,27 @@ export default function AnalyticsPage() {
   }
 
   // Prepare chart data
-  const prepareVisitorChartData = () => {
+  const prepareVisitorChartData = (): ChartDataPoint[] => {
     if (!analyticsData?.dailyAnalytics) return []
 
-    return analyticsData.dailyAnalytics.map((day: any) => ({
+    return analyticsData.dailyAnalytics.map((day) => ({
       date: format(new Date(day.date), "dd MMM"),
       "Page Views": day.pageViews || 0,
       "Unique Visitors": day.uniqueVisitors || 0,
-      "New Visitors": day.newVisitors || 0,
-      "Returning Visitors": day.returningVisitors || 0,
+      "New Visitors": 0, // Default value if not available
+      "Returning Visitors": 0, // Default value if not available
     }))
   }
 
   // Add a custom tooltip for the visitor chart to show more detailed information
-  const visitorChartTooltip = (props: any) => {
+  const visitorChartTooltip = (props: TooltipProps) => {
     const { payload, label, active } = props
     if (!active || !payload || payload.length === 0) return null
 
     return (
       <div className="rounded-lg border bg-background p-2 shadow-sm">
         <div className="font-medium">{label}</div>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index) => (
           <div key={`item-${index}`} className="flex items-center gap-2 text-sm">
             <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
             <span>
@@ -160,30 +234,30 @@ export default function AnalyticsPage() {
   }
 
   // Prepare device breakdown data
-  const prepareDeviceData = () => {
+  const prepareDeviceData = (): { name: string; value: number }[] => {
     if (!analyticsData?.deviceBreakdown) return []
 
-    return analyticsData.deviceBreakdown.map((item: any) => ({
+    return analyticsData.deviceBreakdown.map((item) => ({
       name: item.deviceType.charAt(0).toUpperCase() + item.deviceType.slice(1),
       value: item._count.id,
     }))
   }
 
   // Prepare browser breakdown data
-  const prepareBrowserData = () => {
+  const prepareBrowserData = (): { name: string; value: number }[] => {
     if (!analyticsData?.browserBreakdown) return []
 
-    return analyticsData.browserBreakdown.map((item: any) => ({
+    return analyticsData.browserBreakdown.map((item) => ({
       name: item.browser,
       value: item._count.id,
     }))
   }
 
   // Prepare top pages data
-  const prepareTopPagesData = () => {
+  const prepareTopPagesData = (): { path: string; title: string; views: number }[] => {
     if (!analyticsData?.topPages) return []
 
-    return analyticsData.topPages.map((page: any) => ({
+    return analyticsData.topPages.map((page) => ({
       path: page.path,
       title: page.pageTitle || page.path,
       views: page._count.path,
@@ -191,20 +265,20 @@ export default function AnalyticsPage() {
   }
 
   // Prepare top countries data
-  const prepareTopCountriesData = () => {
+  const prepareTopCountriesData = (): { country: string; visitors: number }[] => {
     if (!analyticsData?.topCountries) return []
 
-    return analyticsData.topCountries.map((country: any) => ({
+    return analyticsData.topCountries.map((country) => ({
       country: country.country || "Unknown",
       visitors: country._count.id,
     }))
   }
 
   // Prepare top cities data
-  const prepareTopCitiesData = () => {
+  const prepareTopCitiesData = (): { city: string; country: string; visitors: number }[] => {
     if (!analyticsData?.topCities) return []
 
-    return analyticsData.topCities.map((city: any) => ({
+    return analyticsData.topCities.map((city) => ({
       city: city.city || "Unknown",
       country: city.country || "Unknown",
       visitors: city._count.id,
@@ -212,14 +286,14 @@ export default function AnalyticsPage() {
   }
 
   // Get average session duration from analytics data
-  const getAvgSessionDuration = () => {
+  const getAvgSessionDuration = (): number => {
     if (!analyticsData?.dailyAnalytics || analyticsData.dailyAnalytics.length === 0) return 0
 
     // Calculate average across all days with proper weighting by page views
     let totalDuration = 0
     let totalPageViews = 0
 
-    analyticsData.dailyAnalytics.forEach((day: { avgSessionDuration: number; pageViews: number }) => {
+    analyticsData.dailyAnalytics.forEach((day: { avgSessionDuration?: number; pageViews: number }) => {
       if (day.avgSessionDuration && day.pageViews) {
         totalDuration += day.avgSessionDuration * day.pageViews
         totalPageViews += day.pageViews
@@ -230,15 +304,15 @@ export default function AnalyticsPage() {
   }
 
   // Get bounce rate from analytics data
-  const getBounceRate = () => {
+  const getBounceRate = (): number => {
     if (!analyticsData?.dailyAnalytics || analyticsData.dailyAnalytics.length === 0) return 0
 
     // Calculate weighted average bounce rate
     let totalBounces = 0
     let totalSessions = 0
 
-    analyticsData.dailyAnalytics.forEach((day: { bounceRate: number | null; uniqueVisitors: number }) => {
-      if (day.bounceRate !== null && day.uniqueVisitors) {
+    analyticsData.dailyAnalytics.forEach((day: { bounceRate?: number | null; uniqueVisitors: number }) => {
+      if (day.bounceRate !== null && day.bounceRate !== undefined && day.uniqueVisitors) {
         // Convert bounce rate percentage to number of bounces
         const bounces = Math.round((day.bounceRate / 100) * day.uniqueVisitors)
         totalBounces += bounces
@@ -269,8 +343,8 @@ export default function AnalyticsPage() {
     Other: "#f59e0b", // Amber
   }
 
-  // Get color for device
-  const getDeviceColor = (deviceType: string) => {
+  // Get color for device - keeping this for potential future use
+  const _getDeviceColor = (deviceType: string): string => {
     const type = deviceType.toLowerCase()
     if (type.includes("desktop")) return deviceColors.Desktop
     if (type.includes("mobile")) return deviceColors.Mobile
@@ -279,7 +353,7 @@ export default function AnalyticsPage() {
   }
 
   // Get color for browser
-  const getBrowserColor = (browser: string) => {
+  const getBrowserColor = (browser: string): string => {
     const name = browser.toLowerCase()
     if (name.includes("chrome")) return browserColors.Chrome
     if (name.includes("firefox")) return browserColors.Firefox
@@ -305,14 +379,16 @@ export default function AnalyticsPage() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn("justify-start text-left font-normal rounded-xl", !startDate && "text-muted-foreground")}
+                  className={cn(
+                    "justify-start text-left font-normal rounded-xl",
+                    !startDate && "text-muted-foreground",
+                  )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, "PPP") : "Start date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-white">
-
                 <Calendar
                   mode="single"
                   selected={startDate}
@@ -434,7 +510,7 @@ export default function AnalyticsPage() {
                     index="date"
                     categories={["Page Views", "Unique Visitors", "New Visitors", "Returning Visitors"]}
                     colors={["blue", "indigo", "green", "purple"]}
-                    valueFormatter={(number) => number.toString()}
+                    valueFormatter={(number: number) => number.toString()}
                     showLegend
                     showAnimation
                     customTooltip={visitorChartTooltip}
@@ -455,7 +531,7 @@ export default function AnalyticsPage() {
                       category="value"
                       index="name"
                       colors={Object.values(deviceColors)}
-                      valueFormatter={(number) => `${number} visitors`}
+                      valueFormatter={(number: number) => `${number} visitors`}
                       showAnimation
                     />
                     <div className="mt-4 flex flex-wrap justify-center gap-3">
@@ -503,18 +579,18 @@ export default function AnalyticsPage() {
                       index="name"
                       categories={["value"]}
                       colors={["blue"]}
-                      valueFormatter={(number) => `${number} visitors`}
+                      valueFormatter={(number: number) => `${number} visitors`}
                       showLegend={false}
                       showAnimation
-                      customTooltip={(props) => {
+                      customTooltip={(props: TooltipProps) => {
                         const { payload, active } = props
                         if (!active || !payload) return null
 
                         const categoryValue = payload[0]?.payload
                         if (!categoryValue) return null
 
-                        const browserName = categoryValue.name
-                        const value = categoryValue.value
+                        const browserName = categoryValue.name as string
+                        const value = categoryValue.value as number
                         const color = getBrowserColor(browserName)
 
                         return (
@@ -565,7 +641,7 @@ export default function AnalyticsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {prepareTopPagesData().map((page: { title: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; path: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; views: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
+                    {prepareTopPagesData().map((page, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <div className="font-medium">{page.title}</div>
@@ -623,7 +699,7 @@ export default function AnalyticsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {prepareTopCountriesData().map((country: { country: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; visitors: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
+                      {prepareTopCountriesData().map((country, index) => (
                         <TableRow key={index}>
                           <TableCell>
                             <div className="flex items-center">
@@ -661,7 +737,7 @@ export default function AnalyticsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {prepareTopCitiesData().map((city: { city: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; country: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; visitors: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
+                      {prepareTopCitiesData().map((city, index) => (
                         <TableRow key={index}>
                           <TableCell>{city.city}</TableCell>
                           <TableCell>{city.country}</TableCell>

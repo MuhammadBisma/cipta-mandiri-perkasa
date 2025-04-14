@@ -1,6 +1,93 @@
 import { NextResponse } from "next/server"
-import { getIpAddress, parseUserAgent, getGeolocationData } from "@/lib/analytics"
-import prisma from "@/lib/db"
+import prisma from "@/lib/prisma"
+
+// Helper function to get IP address from request
+function getIpAddress(request: Request): string {
+  const forwardedFor = request.headers.get("x-forwarded-for")
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim()
+  }
+
+  const realIp = request.headers.get("x-real-ip")
+  if (realIp) {
+    return realIp
+  }
+
+  // Fallback to a placeholder for local development
+  return "127.0.0.1"
+}
+
+// Helper function to parse user agent
+function parseUserAgent(userAgent: string | null) {
+  if (!userAgent) return { browser: "Unknown", os: "Unknown", device: "Unknown" }
+
+  // Simple user agent parsing
+  const browser = userAgent.includes("Chrome")
+    ? "Chrome"
+    : userAgent.includes("Firefox")
+      ? "Firefox"
+      : userAgent.includes("Safari")
+        ? "Safari"
+        : userAgent.includes("Edge")
+          ? "Edge"
+          : "Unknown"
+
+  const os = userAgent.includes("Windows")
+    ? "Windows"
+    : userAgent.includes("Mac")
+      ? "MacOS"
+      : userAgent.includes("Linux")
+        ? "Linux"
+        : userAgent.includes("Android")
+          ? "Android"
+          : userAgent.includes("iPhone") || userAgent.includes("iPad")
+            ? "iOS"
+            : "Unknown"
+
+  const device = userAgent.includes("Mobile") ? "mobile" : userAgent.includes("Tablet") ? "tablet" : "desktop"
+
+  return { browser, os, device }
+}
+
+// Helper function to get geolocation data
+async function getGeolocationData(ipAddress: string) {
+  // Skip geolocation for localhost or private IPs
+  if (ipAddress === "127.0.0.1" || ipAddress.startsWith("192.168.") || ipAddress.startsWith("10.")) {
+    return { country: "Local", city: "Development", region: "Local" }
+  }
+
+  try {
+    // Use a free IP geolocation API with timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000)
+
+    const response = await fetch(`https://ipapi.co/${ipAddress}/json/`, {
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      // If rate limited, return default values instead of throwing
+      if (response.status === 429) {
+        console.warn("Geolocation API rate limited, using default values")
+        return { country: "Unknown (Rate Limited)", city: "Unknown", region: "Unknown" }
+      }
+      throw new Error(`Geolocation API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    return {
+      country: data.country_name || "Unknown",
+      city: data.city || "Unknown",
+      region: data.region || "Unknown",
+    }
+  } catch (error) {
+    console.error("Error fetching geolocation data:", error)
+    return { country: "Unknown", city: "Unknown", region: "Unknown" }
+  }
+}
 
 export async function POST(request: Request) {
   try {

@@ -83,56 +83,65 @@ export default function Contact() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) return
-
-    setIsSubmitting(true)
-
+    e.preventDefault();
+  
+    // Validate form first
+    if (!validateForm()) {
+      return;
+    }
+  
+    setIsSubmitting(true);
+    setErrors({});
+  
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, phone, message }),
-      })
-
-      const data = await response.json()
-
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          message
+        }),
+      });
+  
+      const data = await response.json();
+  
       if (!response.ok) {
-        throw new Error(data.message || "Terjadi kesalahan saat mengirim pesan")
+        throw new Error(data.message || "Failed to send message");
       }
-
-      setIsSubmitted(true)
-
+  
+      // Success case
+      setIsSubmitted(true);
       toast({
         title: "Pesan Terkirim!",
-        description: "Terima kasih telah menghubungi kami. Tim kami akan segera menghubungi Anda.",
+        description: data.message || "Terima kasih telah menghubungi kami.",
         variant: "default",
-      })
-
-      // Reset form after 2 seconds
-      setTimeout(() => {
-        setName("")
-        setEmail("")
-        setPhone("")
-        setMessage("")
-        setIsSubmitted(false)
-        if (formRef.current) formRef.current.reset()
-      }, 2000)
+      });
+  
+      // Reset form
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMessage("");
+  
     } catch (error) {
-      console.error("Error sending message:", error)
+      console.error("Submission error:", error);
+      
       toast({
         title: "Gagal Mengirim Pesan",
-        description:
-          error instanceof Error ? error.message : "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi nanti.",
+        description: error instanceof Error 
+          ? error.message 
+          : "Terjadi kesalahan tidak terduga. Silakan coba lagi nanti.",
         variant: "destructive",
-      })
+      });
+      
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -162,7 +171,7 @@ export default function Contact() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Hubungi Kami</h2>
+          <h2 className="heading-primary">Hubungi Kami</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6 rounded-full"></div>
           <p className="max-w-3xl mx-auto text-lg text-gray-600">
             Konsultasikan kebutuhan Anda dengan tim kami untuk mendapatkan solusi terbaik.
@@ -198,7 +207,7 @@ export default function Contact() {
                   <div>
                     <h4 className="text-lg font-medium mb-1">Telepon</h4>
                     <p className="text-gray-600">+62 812-3456-7890</p>
-                    <p className="text-gray-600">+62 21-1234-5678</p>
+                    <p className="text-gray-600">+62 812-3456-7890</p>
                   </div>
                 </div>
 

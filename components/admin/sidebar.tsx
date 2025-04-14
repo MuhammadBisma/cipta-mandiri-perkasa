@@ -49,10 +49,7 @@ export default function Sidebar() {
   const router = useRouter()
 
   const handleLogout = () => {
-    // Remove the auth token cookie
     Cookies.remove("auth_token")
-
-    // Redirect to login page
     router.push("/login")
   }
 
@@ -74,8 +71,8 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      {/* Mobile menu button - positioned below header */}
+      <div className="lg:hidden fixed top-20 left-4 z-50">
         <Button
           variant="outline"
           size="icon"
@@ -87,27 +84,33 @@ export default function Sidebar() {
         </Button>
       </div>
 
-      {/* Sidebar for desktop */}
+      {/* Desktop Sidebar */}
       <motion.div
-        className="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg hidden lg:block lg:translate-x-0"
+        className="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg hidden lg:block"
         initial={{ x: 0 }}
         animate={{ x: 0 }}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-4 border-b">
-            <Image
-              src="/placeholder.svg?height=40&width=180"
-              alt="Cipta Mandiri Perkasa Logo"
-              width={180}
-              height={40}
-              className="h-10 w-auto"
-            />
+          {/* Logo Section */}
+          <div className="p-4 border-b sticky top-0 bg-white z-10">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="Cipta Mandiri Perkasa Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+              />
+              <div className="flex flex-col leading-tight">
+                <span className="text-primary font-bold text-lg">Cipta Mandiri</span>
+                <span className="text-yellow-500 font-bold text-sm -mt-1">Perkasa</span>
+              </div>
+            </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4">
-            <ul className="space-y-2">
+          <nav className="flex-1 overflow-y-auto">
+            <ul className="space-y-2 p-4">
               {navItems.map((item) => (
                 <li key={item.title}>
                   <Link href={item.href}>
@@ -137,10 +140,10 @@ export default function Sidebar() {
           </nav>
 
           {/* Logout button */}
-          <div className="p-4 border-t">
+          <div className="sticky bottom-0 bg-white border-t p-4">
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center group hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors duration-300 rounded-xl"
+              className="w-full flex items-center justify-center group hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors duration-300"
               onClick={handleLogout}
             >
               <LogOut className="h-5 w-5 mr-2 group-hover:text-red-600" />
@@ -150,7 +153,7 @@ export default function Sidebar() {
         </div>
       </motion.div>
 
-      {/* Mobile sidebar */}
+      {/* Mobile Sidebar */}
       <motion.div
         className="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg lg:hidden"
         variants={sidebarVariants}
@@ -159,22 +162,39 @@ export default function Sidebar() {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-4 border-b">
-            <Image
-              src="/logo.svg" 
-              alt="Cipta Mandiri Perkasa Logo"
-              width={100}    
-              height={40}   
-              className="h-auto w-[180px]" 
-              priority       
-            />
+          {/* Logo Section */}
+          <div className="p-4 border-b sticky top-0 bg-white z-10">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="Cipta Mandiri Perkasa Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+                priority
+              />
+              <div className="flex flex-col leading-tight">
+                <span className="text-primary font-bold text-lg">Cipta Mandiri</span>
+                <span className="text-yellow-500 font-bold text-sm -mt-1">Perkasa</span>
+              </div>
+            </div>
           </div>
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4">
-            <motion.ul className="space-y-2" variants={itemVariants} initial="closed" animate="open">
+
+          {/* Navigation with proper spacing */}
+          <nav className="flex-1 overflow-y-auto pb-4">
+            <motion.ul 
+              className="space-y-2 px-4 pt-2"
+              variants={itemVariants}
+              initial="closed"
+              animate="open"
+            >
               {navItems.map((item) => (
-                <motion.li key={item.title} variants={itemVariants} transition={itemTransition}>
+                <motion.li 
+                  key={item.title}
+                  variants={itemVariants}
+                  transition={itemTransition}
+                  className="mb-2 last:mb-0"
+                >
                   <Link href={item.href}>
                     <div
                       className={`flex items-center px-4 py-3 rounded-md transition-all duration-200 ${
@@ -202,7 +222,7 @@ export default function Sidebar() {
           </nav>
 
           {/* Logout button */}
-          <div className="p-4 border-t">
+          <div className="sticky bottom-0 bg-white border-t p-4">
             <Button
               variant="outline"
               className="w-full flex items-center justify-center group hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors duration-300"

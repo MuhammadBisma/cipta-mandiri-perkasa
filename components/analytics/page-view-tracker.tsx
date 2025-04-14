@@ -2,6 +2,11 @@
 
 import { useEffect, useRef } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
+import {
+  trackPageViewViaAPI,
+  updatePageViewDurationViaAPI,
+  sendPageViewDurationViaBeacon,
+} from "@/lib/analytics-client"
 
 interface PageViewTrackerProps {
   blogPostId?: string
@@ -37,28 +42,19 @@ export default function PageViewTracker({ blogPostId, galleryId }: PageViewTrack
         // Get query parameters
         const queryParamsString = searchParams.toString()
 
-        // Send the page view data to the API
-        const response = await fetch("/api/analytics/page-view", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            path: pathname,
-            pageTitle,
-            referrer,
-            queryParams: queryParamsString || null,
-            blogPostId,
-            galleryId,
-          }),
-        })
+        // Send the page view data to the API using our client-safe function
+        const data = await trackPageViewViaAPI(
+          pathname,
+          pageTitle,
+          referrer,
+          queryParamsString || null,
+          blogPostId,
+          galleryId,
+        )
 
-        if (!response.ok) {
-          throw new Error(`Failed to track page view: ${response.status}`)
+        if (data && data.result && data.result.pageView) {
+          pageViewId.current = data.result.pageView.id
         }
-
-        const data = await response.json()
-        pageViewId.current = data.result?.pageView?.id || null
       } catch (error) {
         console.error("Error tracking page view:", error)
       }
@@ -73,17 +69,7 @@ export default function PageViewTracker({ blogPostId, galleryId }: PageViewTrack
 
       try {
         const duration = Math.floor((Date.now() - startTime.current) / 1000)
-
-        await fetch("/api/analytics/page-view", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pageViewId: pageViewId.current,
-            duration,
-          }),
-        })
+        await updatePageViewDurationViaAPI(pageViewId.current, duration)
       } catch (error) {
         console.error("Error updating page view duration:", error)
       }
@@ -102,14 +88,8 @@ export default function PageViewTracker({ blogPostId, galleryId }: PageViewTrack
 
       const duration = Math.floor((Date.now() - startTime.current) / 1000)
 
-      // Use the sendBeacon API for more reliable tracking on page unload
-      navigator.sendBeacon(
-        "/api/analytics/page-view",
-        JSON.stringify({
-          pageViewId: pageViewId.current,
-          duration,
-        }),
-      )
+      // Use our client-safe function to send the beacon
+      sendPageViewDurationViaBeacon(pageViewId.current, duration)
     }
 
     window.addEventListener("beforeunload", handleBeforeUnload)

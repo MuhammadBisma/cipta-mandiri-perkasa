@@ -91,11 +91,10 @@ export default async function BlogPostPage({ params }: Props) {
           {/* Main Content */}
           <div className="w-full lg:w-2/3">
             <Link href="/blog">
-              <Button variant="outline" size="sm" className="mb-6">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Kembali ke Blog
-              </Button>
+            <Button variant="outline" size="sm" className="bg-blue-500 rounded-xl mb-6 text-white hover:bg-blue-600">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Kembali ke Blog
+            </Button>
             </Link>
-
             <article className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="relative h-[300px] md:h-[400px]">
                 <Image

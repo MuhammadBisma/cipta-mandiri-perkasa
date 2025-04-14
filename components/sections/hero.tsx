@@ -151,7 +151,7 @@ export default function Hero() {
               >
                 <path d="M16 0C7.2 0 0 6.9 0 15.3c0 2.7.7 5.3 2.1 7.5L0 32l9.4-2.4c2 .5 4 .8 6.1.8 8.8 0 16-6.9 16-15.3S24.8 0 16 0zm0 28.4c-1.8 0-3.5-.3-5.1-.8l-.4-.1-5.6 1.4 1.5-5.3-.3-.4c-1.3-1.9-2-4.2-2-6.6 0-6.6 5.6-11.9 12.5-11.9s12.5 5.3 12.5 11.9-5.6 11.9-12.5 11.9zm6.8-8.8c-.4-.2-2.5-1.2-2.9-1.3-.4-.2-.6-.2-.8.2-.2.4-.9 1.3-1.1 1.5-.2.2-.4.2-.8 0-.4-.2-1.5-.5-2.9-1.7-1.1-.9-1.8-2-2-2.3-.2-.3 0-.5.1-.7.1-.1.3-.4.5-.6.1-.2.1-.4.2-.6 0-.2 0-.5-.1-.7-.2-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6-.2 0-.4 0-.6 0s-.6.1-.9.4c-.3.3-1.2 1.1-1.2 2.6s1.3 3 1.5 3.2c.2.2 2.5 3.9 6 5.4.8.3 1.5.5 2 .6.8.2 1.6.2 2.2.1.7-.1 2.5-1 2.9-2 .4-1 .4-1.8.3-2 0-.2-.3-.3-.7-.5z"/>
               </svg>
-              <span className="truncate">Hubungi via WhatsApp</span>
+              <span aria-label="Hubungi via WhatsApp" className="truncate">Hubungi via WhatsApp</span>
             </Button>
             
             {/* Phone Button - only on mobile */}
@@ -161,7 +161,7 @@ export default function Hero() {
                 className="rounded-full px-4 py-4 text-sm font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all flex items-center justify-center flex-1 w-full"
               >
                 <Phone className="h-4 w-4 mr-2" />
-                <span className="truncate">Hubungi via Telepon</span>
+                <span aria-label="Hubungi via Telpon" className="truncate">Hubungi via Telepon</span>
               </Button>
             )}
             

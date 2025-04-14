@@ -23,6 +23,8 @@ const categories = [
   { id: "menara", name: "Menara" },
   { id: "kerawangan", name: "Kerawangan" },
   { id: "kaligrafi", name: "Kaligrafi" },
+  { id: "masjid", name: "Masjid" },
+  { id: "ornamen", name: "Ornamen" }, 
 ]
 
 export default function Gallery() {
@@ -132,8 +134,8 @@ export default function Gallery() {
         {filteredItems.length > 0 && (
           <div className="mt-10 text-center">
             <Link href="/gallery">
-              <Button className="btn-primary rounded-full px-6 py-3 text-sm font-medium">
-              Lihat Lebih Banyak
+            <Button className="rounded-xl px-6 py-3 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1">
+                Lihat Lebih Banyak
               </Button>
             </Link>
           </div>
