@@ -22,7 +22,7 @@ const navLinks = [
   },
   { name: "Galeri", href: "/gallery" },
   { name: "Blog", href: "/blog" },
-  { name: "Kontak", href: "/contact" },
+  { name: "Kontak", href: "/#contact" },
 ]
 
 export default function Navbar() {
