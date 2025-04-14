@@ -13,6 +13,7 @@ import Footer from "@/components/layout/footer"
 export const metadata: Metadata = {
   title: "Blog - Cipta Mandiri Perkasa",
   description: "Artikel dan informasi seputar kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi.",
+  keywords:[]
 }
 
 // Categories for filtering
