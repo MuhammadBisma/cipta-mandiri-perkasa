@@ -8,6 +8,7 @@ import PageViewTracker from "@/components/analytics/page-view-tracker"
 import FloatingContactButton from "@/components/floating-contact-button"
 import { Suspense } from "react"
 import StructuredData from "@/components/seo/structured-data"
+import ErrorBoundary from "@/components/error-boundary"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -375,16 +376,16 @@ export default function RootLayout({
       </Script>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {children}
-          <Suspense fallback={null}>
-            <PageViewTracker />
-          </Suspense>
-          <FloatingContactButton />
-          <StructuredData type="LocalBusiness" title={""} description={""} />
+          <ErrorBoundary>
+            {children}
+            <Suspense fallback={null}>
+              <PageViewTracker />
+            </Suspense>
+            <FloatingContactButton />
+            <StructuredData type="LocalBusiness" title={""} description={""} />
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
-import "./globals.css"
