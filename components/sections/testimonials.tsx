@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Star, StarHalf, MessageSquare, X, Upload, Quote, CheckCircle, ChevronDown } from "lucide-react"
+import { Star, StarHalf, MessageSquare, X, Upload, Quote, CheckCircle, ChevronDown, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { motion, useInView } from "framer-motion"
 import { Swiper, SwiperSlide } from "swiper/react"
@@ -28,6 +28,7 @@ type Testimonial = {
 export default function Testimonials() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isSuccessOpen, setIsSuccessOpen] = useState(false)
+  const [isSizeErrorOpen, setIsSizeErrorOpen] = useState(false)
   const [name, setName] = useState("")
   const [position, setPosition] = useState("")
   const [message, setMessage] = useState("")
@@ -73,7 +74,8 @@ export default function Testimonials() {
     if (!file) return
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("Ukuran file terlalu besar. Maksimal 5MB.")
+      setIsSizeErrorOpen(true)
+      e.target.value = '' // Reset input
       return
     }
 
@@ -440,6 +442,30 @@ export default function Testimonials() {
               className="w-full rounded-lg bg-primary hover:bg-primary/90"
             >
               Tutup
+            </Button>
+          </motion.div>
+        </div>
+
+        {/* File Size Error Modal */}
+        <div className={`fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isSizeErrorOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={isSizeErrorOpen ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white rounded-xl p-6 max-w-sm w-full text-center shadow-xl"
+          >
+            <div className="bg-red-100 p-3 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-10 w-10 text-red-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Ukuran File Terlalu Besar</h3>
+            <p className="text-gray-600 mb-6">
+              Ukuran file foto melebihi 5MB. Silakan pilih file yang lebih kecil.
+            </p>
+            <Button 
+              onClick={() => setIsSizeErrorOpen(false)} 
+              className="w-full rounded-lg bg-primary hover:bg-primary/90"
+            >
+              Mengerti
             </Button>
           </motion.div>
         </div>
