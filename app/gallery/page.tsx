@@ -20,18 +20,21 @@ const categories = [
   { id: "kerawangan", name: "Kerawangan" },
   { id: "kaligrafi", name: "Kaligrafi" },
   { id: "masjid", name: "Masjid" },
-  { id: "ornamen", name: "Ornamen" }, 
+  { id: "ornamen", name: "Ornamen" },
 ]
 
 interface GalleryPageProps {
-  searchParams: {
+  searchParams: Promise<{
     category?: string
-  }
+  }>
 }
 
 export default async function GalleryPage({ searchParams }: GalleryPageProps) {
+  // Await searchParams before accessing its properties
+  const resolvedParams = await searchParams
+
   // Handle searchParams safely
-  const category = searchParams?.category || "all"
+  const category = resolvedParams?.category || "all"
 
   let galleryItems
   if (category === "all") {
@@ -67,7 +70,7 @@ export default async function GalleryPage({ searchParams }: GalleryPageProps) {
 
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <main className="pt-24">
         <section className="py-12 md:py-16 bg-primary text-white">
           <div className="container">
@@ -77,8 +80,8 @@ export default async function GalleryPage({ searchParams }: GalleryPageProps) {
             </p>
             {/* Tombol Kembali */}
             <Link href="/#gallery">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="rounded-xl bg-white text-primary hover:bg-white/90 hover:text-primary/90 transition-colors"
               >
                 Kembali ke Beranda
@@ -145,7 +148,7 @@ export default async function GalleryPage({ searchParams }: GalleryPageProps) {
           </div>
         </section>
       </main>
-      <Footer/>
+      <Footer />
     </>
   )
 }

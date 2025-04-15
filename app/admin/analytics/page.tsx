@@ -89,12 +89,10 @@ interface ChartDataPoint {
 
 interface TooltipProps {
   payload?: {
-    payload: {
-      [key: string]: string | number
-    }
-    color: string
-    name: string
+    payload: any
     value: number
+    name: string
+    color: string
   }[]
   label?: string
   active?: boolean
@@ -226,8 +224,7 @@ export default function AnalyticsPage() {
   }
 
   // Add a custom tooltip for the visitor chart to show more detailed information
-  const visitorChartTooltip = (props: TooltipProps) => {
-    const { payload, label, active } = props
+  const visitorChartTooltip = ({ payload, label, active }: TooltipProps) => {
     if (!active || !payload || payload.length === 0) return null
 
     return (
