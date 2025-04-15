@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: {
     template: "%s | Cipta Mandiri Perkasa",
-    default: "Cipta Mandiri Perkasa - Spesialis Kubah Masjid & Ornamen Islami",
+    default: "Spesialis GRC Kubah Masjid & Ornamen Islami",
   },
   description:
     "Cipta Mandiri Perkasa adalah perusahaan spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
