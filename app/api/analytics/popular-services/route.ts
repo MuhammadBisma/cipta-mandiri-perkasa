@@ -46,7 +46,13 @@ export async function GET(request: Request) {
     // Format the data for the chart
     const services = servicePageViews.map((service) => {
       // Extract service name from path or use page title
-      let name = service.pageTitle || service.path.split("/").pop() || ""
+      let name = service.pageTitle || ""
+
+      if (!name) {
+        // Extract from path more carefully
+        const pathParts = service.path.split("/").filter(Boolean)
+        name = pathParts.length > 1 ? pathParts[1] : service.path
+      }
 
       // Clean up the name
       name = name
@@ -59,15 +65,18 @@ export async function GET(request: Request) {
         name = name.substring(0, 22) + "..."
       }
 
+      // Make sure the path is valid
+      const path = service.path.startsWith("/") ? service.path : `/${service.path}`
+
       return {
         name,
         value: service._count.path,
-        path: service.path,
+        path,
       }
     })
 
     const defaultServices = [
-      { name: "Kubah Masjid", value: 45, path: "/services/kubah" },
+      { name: "Kubah Masjid", value: 45, path: "/services/kubah-masjid" },
       { name: "Mimbar", value: 38, path: "/services/mimbar" },
       { name: "Menara", value: 32, path: "/services/menara" },
       { name: "Kerawangan", value: 28, path: "/services/kerawangan" },

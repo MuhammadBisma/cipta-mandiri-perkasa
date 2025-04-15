@@ -4,13 +4,25 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { CalendarIcon, RefreshCw, Users, Clock, Globe, Monitor, Smartphone, Tablet } from "lucide-react"
+import {
+  CalendarIcon,
+  RefreshCw,
+  Users,
+  Clock,
+  Globe,
+  Monitor,
+  Smartphone,
+  Tablet,
+  AlertTriangle,
+  LineChart,
+  FileText,
+} from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { AreaChart, BarChart, DonutChart } from "@tremor/react"
+import { AreaChart, DonutChart } from "@tremor/react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import ExportAnalyticsButton from "@/components/analytics/export-analytics-button"
@@ -343,8 +355,8 @@ export default function AnalyticsPage() {
     Other: "#f59e0b", // Amber
   }
 
-  // Get color for device - keeping this for potential future use
-  const _getDeviceColor = (deviceType: string): string => {
+  // Get color for device
+  const getDeviceColor = (deviceType: string): string => {
     const type = deviceType.toLowerCase()
     if (type.includes("desktop")) return deviceColors.Desktop
     if (type.includes("mobile")) return deviceColors.Mobile
@@ -365,8 +377,27 @@ export default function AnalyticsPage() {
     return browserColors.Other
   }
 
+  // Prepare device data with colors
+  const prepareDeviceDataWithColors = () => {
+    const data = prepareDeviceData()
+    return data.map((item) => ({
+      ...item,
+      color: getDeviceColor(item.name),
+    }))
+  }
+
+  // Prepare browser data with colors
+  const prepareBrowserDataWithColors = () => {
+    const data = prepareBrowserData()
+    return data.map((item) => ({
+      ...item,
+      color: getBrowserColor(item.name),
+    }))
+  }
+
   return (
     <div className="space-y-6">
+      {/* Enhance the analytics page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Analytics</h1>
@@ -415,7 +446,11 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button className="rounded-xl" onClick={refreshAnalytics} disabled={isRefreshing}>
+            <Button
+              className="rounded-xl bg-indigo-600 hover:bg-indigo-700"
+              onClick={refreshAnalytics}
+              disabled={isRefreshing}
+            >
               <RefreshCw className={`mr-2 h-4 w-4 rounded-xl ${isRefreshing ? "animate-spin" : ""}`} />
               Refresh
             </Button>
@@ -426,11 +461,20 @@ export default function AnalyticsPage() {
       </div>
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 mb-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="pages">Pages</TabsTrigger>
-          <TabsTrigger value="locations">Locations</TabsTrigger>
-          <TabsTrigger value="real-time">Real-time</TabsTrigger>
+        {/* Enhance the tabs */}
+        <TabsList className="grid grid-cols-4 mb-6 rounded-xl overflow-hidden">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="pages" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+            Pages
+          </TabsTrigger>
+          <TabsTrigger value="locations" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+            Locations
+          </TabsTrigger>
+          <TabsTrigger value="real-time" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+            Real-time
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -449,10 +493,14 @@ export default function AnalyticsPage() {
               ))}
             </div>
           ) : (
+            /* Enhance the stats cards */
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
+              <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-50 to-white">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Total Page Views</CardTitle>
+                  <CardTitle className="text-sm font-medium flex items-center">
+                    <Monitor className="h-4 w-4 mr-2 text-blue-500" />
+                    Total Page Views
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{analyticsData?.totalPageViews || 0}</div>
@@ -462,9 +510,12 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-indigo-50 to-white">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Unique Visitors</CardTitle>
+                  <CardTitle className="text-sm font-medium flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-indigo-500" />
+                    Unique Visitors
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{analyticsData?.uniqueVisitors || 0}</div>
@@ -474,9 +525,12 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-50 to-white">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Avg. Session Duration</CardTitle>
+                  <CardTitle className="text-sm font-medium flex items-center">
+                    <Clock className="h-4 w-4 mr-2 text-green-500" />
+                    Avg. Session Duration
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{formatSessionDuration(getAvgSessionDuration())}</div>
@@ -484,9 +538,12 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-amber-50 to-white">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2 text-amber-500" />
+                    Bounce Rate
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{`${getBounceRate()}%`}</div>
@@ -498,9 +555,13 @@ export default function AnalyticsPage() {
 
           {!isLoading && (
             <>
-              <Card>
+              {/* Enhance the visitor trends chart */}
+              <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300">
                 <CardHeader>
-                  <CardTitle>Visitor Trends</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <LineChart className="h-5 w-5 mr-2 text-indigo-500" />
+                    Visitor Trends
+                  </CardTitle>
                   <CardDescription>Page views and unique visitors over time</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -518,92 +579,67 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
 
+              {/* Enhance the device and browser breakdown charts */}
               <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+                <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300">
                   <CardHeader>
-                    <CardTitle>Device Breakdown</CardTitle>
+                    <CardTitle className="flex items-center">
+                      <Smartphone className="h-5 w-5 mr-2 text-blue-500" />
+                      Device Breakdown
+                    </CardTitle>
                     <CardDescription>Visitors by device type</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <DonutChart
                       className="h-60"
-                      data={prepareDeviceData()}
+                      data={prepareDeviceDataWithColors()}
                       category="value"
                       index="name"
-                      colors={Object.values(deviceColors)}
+                      colors={["#0ea5e9", "#8b5cf6", "#10b981", "#f59e0b"]}
                       valueFormatter={(number: number) => `${number} visitors`}
                       showAnimation
+                      showTooltip
+                      showLabel
                     />
                     <div className="mt-4 flex flex-wrap justify-center gap-3">
-                      <div className="flex items-center">
-                        <div
-                          className="h-3 w-3 rounded-full mr-1"
-                          style={{ backgroundColor: deviceColors.Desktop }}
-                        ></div>
-                        <span className="text-sm">Desktop</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div
-                          className="h-3 w-3 rounded-full mr-1"
-                          style={{ backgroundColor: deviceColors.Mobile }}
-                        ></div>
-                        <span className="text-sm">Mobile</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div
-                          className="h-3 w-3 rounded-full mr-1"
-                          style={{ backgroundColor: deviceColors.Tablet }}
-                        ></div>
-                        <span className="text-sm">Tablet</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div
-                          className="h-3 w-3 rounded-full mr-1"
-                          style={{ backgroundColor: deviceColors.Other }}
-                        ></div>
-                        <span className="text-sm">Other</span>
-                      </div>
+                      {Object.entries(deviceColors).map(([name, color]) => (
+                        <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
+                          <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
+                          <span className="text-sm">{name}</span>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300">
                   <CardHeader>
-                    <CardTitle>Browser Breakdown</CardTitle>
+                    <CardTitle className="flex items-center">
+                      <Globe className="h-5 w-5 mr-2 text-indigo-500" />
+                      Browser Breakdown
+                    </CardTitle>
                     <CardDescription>Visitors by browser</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <BarChart
+                    <DonutChart
                       className="h-60"
-                      data={prepareBrowserData()}
+                      data={prepareBrowserDataWithColors()}
+                      category="value"
                       index="name"
-                      categories={["value"]}
-                      colors={["blue"]}
+                      colors={Object.values(browserColors)}
                       valueFormatter={(number: number) => `${number} visitors`}
-                      showLegend={false}
                       showAnimation
-                      customTooltip={(props: TooltipProps) => {
-                        const { payload, active } = props
-                        if (!active || !payload) return null
-
-                        const categoryValue = payload[0]?.payload
-                        if (!categoryValue) return null
-
-                        const browserName = categoryValue.name as string
-                        const value = categoryValue.value as number
-                        const color = getBrowserColor(browserName)
-
-                        return (
-                          <div className="rounded-lg border bg-background p-2 shadow-sm">
-                            <div className="flex items-center">
-                              <div className="h-2 w-2 rounded-full mr-1" style={{ backgroundColor: color }}></div>
-                              <span className="font-medium">{browserName}</span>
-                            </div>
-                            <div className="mt-1 text-sm text-muted-foreground">{value} visitors</div>
-                          </div>
-                        )
-                      }}
+                      showTooltip
+                      showLabel
                     />
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
+                      {Object.entries(browserColors).map(([name, color]) => (
+                        <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
+                          <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
+                          <span className="text-sm">{name}</span>
+                        </div>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -627,27 +663,31 @@ export default function AnalyticsPage() {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            /* Enhance the top pages card */
+            <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300">
               <CardHeader>
-                <CardTitle>Top Pages</CardTitle>
+                <CardTitle className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-indigo-500" />
+                  Top Pages
+                </CardTitle>
                 <CardDescription>Most visited pages on your website</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-gray-50">
                       <TableHead>Page</TableHead>
                       <TableHead className="text-right">Views</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {prepareTopPagesData().map((page, index) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                         <TableCell>
                           <div className="font-medium">{page.title}</div>
                           <div className="text-sm text-gray-500">{page.path}</div>
                         </TableCell>
-                        <TableCell className="text-right">{page.views}</TableCell>
+                        <TableCell className="text-right font-medium">{page.views}</TableCell>
                       </TableRow>
                     ))}
                     {prepareTopPagesData().length === 0 && (
@@ -760,7 +800,8 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         <TabsContent value="real-time" className="space-y-6">
-          <Card>
+          {/* Enhance the real-time visitors card */}
+          <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Users className="h-5 w-5 mr-2 text-primary" />
@@ -770,62 +811,66 @@ export default function AnalyticsPage() {
               <CardDescription>Visitors currently active on your website (last 5 minutes)</CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Browser</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>Current Page</TableHead>
-                    <TableHead>Last Activity</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {realTimeVisitors.map((visitor) => (
-                    <TableRow key={visitor.id}>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Globe className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>
-                            {visitor.city && visitor.city !== "Unknown"
-                              ? `${visitor.city}, ${visitor.country}`
-                              : visitor.country}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{visitor.browser}</TableCell>
-                      <TableCell>
-                        {visitor.device === "mobile" ? (
-                          <Smartphone className="h-4 w-4 text-gray-500" />
-                        ) : visitor.device === "tablet" ? (
-                          <Tablet className="h-4 w-4 text-gray-500" />
-                        ) : (
-                          <Monitor className="h-4 w-4 text-gray-500" />
-                        )}
-                        <span className="ml-2">{visitor.device}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="max-w-[200px] truncate" title={visitor.currentPage}>
-                          {visitor.currentPage}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-2 text-gray-500" />
-                          <span>{format(new Date(visitor.lastActive), "HH:mm:ss")}</span>
-                        </div>
-                      </TableCell>
+              <div className="rounded-lg border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50">
+                      <TableHead>Location</TableHead>
+                      <TableHead>Browser</TableHead>
+                      <TableHead>Device</TableHead>
+                      <TableHead>Current Page</TableHead>
+                      <TableHead>Last Activity</TableHead>
                     </TableRow>
-                  ))}
-                  {realTimeVisitors.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                        No active visitors at the moment
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {realTimeVisitors.map((visitor, index) => (
+                      <TableRow key={visitor.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Globe className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>
+                              {visitor.city && visitor.city !== "Unknown"
+                                ? `${visitor.city}, ${visitor.country}`
+                                : visitor.country}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{visitor.browser}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            {visitor.device === "mobile" ? (
+                              <Smartphone className="h-4 w-4 mr-2 text-gray-500" />
+                            ) : visitor.device === "tablet" ? (
+                              <Tablet className="h-4 w-4 mr-2 text-gray-500" />
+                            ) : (
+                              <Monitor className="h-4 w-4 mr-2 text-gray-500" />
+                            )}
+                            <span>{visitor.device}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="max-w-[200px] truncate" title={visitor.currentPage}>
+                            {visitor.currentPage}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>{format(new Date(visitor.lastActive), "HH:mm:ss")}</span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {realTimeVisitors.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                          No active visitors at the moment
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

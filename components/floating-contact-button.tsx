@@ -13,13 +13,13 @@ export default function FloatingContactButton() {
   const heroSectionRef = useRef<HTMLElement | null>(null)
   const pathname = usePathname()
 
-  // Check if current page is admin page
-  const isAdminPage = pathname?.startsWith("/admin")
+  // Check if current page is admin or login page
+  const isHiddenPage = pathname?.startsWith("/admin") || pathname === "/login"
 
   // Find hero section and set up intersection observer
   useEffect(() => {
-    // If on admin page, don't show the button
-    if (isAdminPage) {
+    // If on hidden page, don't show the button
+    if (isHiddenPage) {
       setIsVisible(false)
       return
     }
@@ -44,7 +44,7 @@ export default function FloatingContactButton() {
         observer.unobserve(heroSection)
       }
     }
-  }, [isAdminPage])
+  }, [isHiddenPage])
 
   // Show popup every 3 seconds
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function FloatingContactButton() {
     setIsOpen(false)
   }
 
-  if (!isVisible || isAdminPage) return null
+  if (!isVisible || isHiddenPage) return null
 
   return (
     <div className="fixed bottom-6 right-6 z-50">

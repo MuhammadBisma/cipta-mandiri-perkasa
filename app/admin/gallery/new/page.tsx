@@ -12,8 +12,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Upload, X } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Upload, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const categories = ["kubah", "mimbar", "menara", "kerawangan", "kaligrafi", "masjid", "ornamen"]
 
@@ -24,6 +32,8 @@ export default function NewGalleryItem() {
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [successModalOpen, setSuccessModalOpen] = useState(false)
+  const [createdItemTitle, setCreatedItemTitle] = useState("")
   const router = useRouter()
   const { toast } = useToast()
 
@@ -48,6 +58,14 @@ export default function NewGalleryItem() {
       setImagePreview(reader.result as string)
     }
     reader.readAsDataURL(file)
+  }
+
+  const resetForm = () => {
+    setTitle("")
+    setDescription("")
+    setCategory("")
+    setImage(null)
+    setImagePreview(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,8 +98,11 @@ export default function NewGalleryItem() {
         description: "Item galeri berhasil ditambahkan",
       })
 
-      router.push("/admin/gallery")
-      router.refresh()
+      // Save the created item title for the success modal
+      setCreatedItemTitle(title)
+
+      // Open success modal
+      setSuccessModalOpen(true)
     } catch (error) {
       toast({
         title: "Error",
@@ -93,6 +114,16 @@ export default function NewGalleryItem() {
     }
   }
 
+  const handleCreateAnother = () => {
+    resetForm()
+    setSuccessModalOpen(false)
+  }
+
+  const handleBackToList = () => {
+    router.push("/admin/gallery")
+    router.refresh()
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -101,12 +132,9 @@ export default function NewGalleryItem() {
           <p className="text-gray-500">Tambahkan foto baru ke galeri Cipta Mandiri Perkasa</p>
         </div>
         <Link href="/admin/gallery">
-          <Button 
-            variant="outline" 
-            className="rounded-xl border-gray-300 hover:bg-gray-50 hover:text-gray-900"
-          >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Kembali
+          <Button variant="outline" className="rounded-xl border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Kembali
           </Button>
         </Link>
       </div>
@@ -143,21 +171,17 @@ export default function NewGalleryItem() {
               <div className="space-y-2">
                 <Label htmlFor="category">Kategori</Label>
                 <Select value={category} onValueChange={setCategory} required>
-                <SelectTrigger className="bg-white rounded-xl hover:bg-white focus:bg-white data-[state=open]:bg-white">
-                  <SelectValue placeholder="Pilih kategori" />
-                </SelectTrigger>
-                <SelectContent className="bg-white mt-1">
-                  {categories.map((cat) => (
-                    <SelectItem 
-                      key={cat} 
-                      value={cat}
-                      className="hover:bg-gray-100 focus:bg-gray-100"
-                    >
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectTrigger className="bg-white rounded-xl hover:bg-white focus:bg-white data-[state=open]:bg-white">
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white mt-1">
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat} className="hover:bg-gray-100 focus:bg-gray-100">
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
@@ -213,6 +237,39 @@ export default function NewGalleryItem() {
           </Card>
         </div>
       </form>
+
+      {/* Success Modal */}
+      <Dialog open={successModalOpen} onOpenChange={setSuccessModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
+              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            </div>
+            <DialogTitle className="text-center text-xl">Item Galeri Berhasil Ditambahkan</DialogTitle>
+            <DialogDescription className="text-center">
+              Item galeri <span className="font-medium">"{createdItemTitle}"</span> telah berhasil ditambahkan ke dalam
+              sistem.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center mt-2">
+            <Image
+              src={imagePreview || "/placeholder.svg"}
+              alt="Preview"
+              width={200}
+              height={200}
+              className="rounded-md object-cover h-[200px] w-[200px]"
+            />
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 mt-6">
+            <Button variant="outline" onClick={handleCreateAnother} className="w-full sm:w-auto">
+              Buat Item Lain
+            </Button>
+            <Button onClick={handleBackToList} className="w-full sm:w-auto bg-primary">
+              Kembali ke Daftar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -14,17 +14,32 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
+  Globe,
+  Smartphone,
+  Tablet,
+  Monitor,
+  Clock,
+  Star,
 } from "lucide-react"
 import { motion } from "framer-motion"
 import DashboardCard from "@/components/admin/dashboard-card"
 import ActivityCard from "@/components/admin/activity-card"
 import StatsCard from "@/components/admin/stats-card"
-import { AreaChart, BarChart } from "@tremor/react"
+import { AreaChart, DonutChart } from "@tremor/react"
 import { Button } from "@/components/ui/button"
 import { format, subDays, formatDistanceToNow } from "date-fns"
 import { id } from "date-fns/locale"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import Image from "next/image"
 
 interface DashboardData {
   blogCount: number
@@ -81,8 +96,19 @@ interface ServiceData {
   path: string
 }
 
-// Define service colors - one for each service
-const serviceColors = ["indigo", "cyan", "emerald", "amber", "rose", "blue", "purple", "green", "yellow", "red"]
+// Define service colors with actual color values
+const serviceColors = [
+  "#6366f1", // indigo
+  "#06b6d4", // cyan
+  "#10b981", // emerald
+  "#f59e0b", // amber
+  "#f43f5e", // rose
+  "#3b82f6", // blue
+  "#8b5cf6", // purple
+  "#22c55e", // green
+  "#eab308", // yellow
+  "#ef4444", // red
+]
 
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
@@ -99,6 +125,9 @@ export default function AdminDashboard() {
   const eventSourceRef = useRef<EventSource | null>(null)
   const router = useRouter()
   const { toast } = useToast()
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [approvedTestimonial, setApprovedTestimonial] = useState<Testimonial | null>(null)
 
   // Function to generate mock visitor data for the last 7 days
   const generateMockVisitorData = () => {
@@ -145,8 +174,13 @@ export default function AdminDashboard() {
       const data = await res.json()
 
       if (data.success && Array.isArray(data.services)) {
-        setServiceData(data.services)
-        return data.services
+        // Assign colors to each service
+        const servicesWithColors = data.services.map((service: any, index: number) => ({
+          ...service,
+          color: serviceColors[index % serviceColors.length],
+        }))
+        setServiceData(servicesWithColors)
+        return servicesWithColors
       } else {
         throw new Error("Invalid response format")
       }
@@ -560,7 +594,7 @@ export default function AdminDashboard() {
             description="Total artikel blog"
             color="blue"
             index={0}
-            className="h-full"
+            className="h-full rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
           />
         </div>
         <div className="h-full">
@@ -571,7 +605,7 @@ export default function AdminDashboard() {
             description="Total item galeri"
             color="green"
             index={1}
-            className="h-full"
+            className="h-full rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
           />
         </div>
         <div className="h-full">
@@ -582,7 +616,7 @@ export default function AdminDashboard() {
             description="Total testimoni"
             color="yellow"
             index={2}
-            className="h-full"
+            className="h-full rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
           />
         </div>
         <div className="h-full">
@@ -596,7 +630,7 @@ export default function AdminDashboard() {
             badge={newTestimonialAlert ? "Baru!" : undefined}
             isAnimating={newTestimonialAlert}
             onClick={goToTestimonials}
-            className="h-full"
+            className="h-full rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
           />
         </div>
       </div>
@@ -607,11 +641,14 @@ export default function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden bg-gradient-to-br from-amber-50 to-white">
             <CardContent className="pt-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Testimoni Menunggu Persetujuan</h3>
-                <Button variant="outline" size="sm" onClick={goToTestimonials}>
+                <h3 className="text-lg font-semibold flex items-center">
+                  <MessageSquare className="h-5 w-5 mr-2 text-amber-500" />
+                  Testimoni Menunggu Persetujuan
+                </h3>
+                <Button variant="outline" size="sm" onClick={goToTestimonials} className="rounded-lg">
                   Lihat Semua
                 </Button>
               </div>
@@ -622,7 +659,7 @@ export default function AdminDashboard() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="p-4 border rounded-lg bg-amber-50 relative"
+                    className="p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-300 relative"
                   >
                     {new Date(testimonial.createdAt).getTime() > Date.now() - 5 * 60 * 1000 && (
                       <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
@@ -640,16 +677,35 @@ export default function AdminDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-green-600 border-green-200 hover:bg-green-50"
+                        className="text-green-600 border-green-200 hover:bg-green-50 rounded-lg"
                         onClick={async (e) => {
                           e.stopPropagation()
                           try {
-                            await fetch(`/api/testimonials/${testimonial.id}/approve`, {
+                            const res = await fetch(`/api/testimonials/${testimonial.id}/approve`, {
                               method: "POST",
                             })
-                            fetchPendingTestimonials()
+                            if (!res.ok) throw new Error("Failed to approve testimonial")
+
+                            // Set the approved testimonial and show success modal
+                            setApprovedTestimonial(testimonial)
+                            setShowSuccessModal(true)
+
+                            // Update the UI
+                            await fetchPendingTestimonials()
+
+                            // Show toast notification
+                            toast({
+                              title: "Testimoni Disetujui",
+                              description: `Testimoni dari ${testimonial.name} telah berhasil disetujui.`,
+                              variant: "default",
+                            })
                           } catch (error) {
                             console.error("Error approving testimonial:", error)
+                            toast({
+                              title: "Error",
+                              description: "Gagal menyetujui testimoni",
+                              variant: "destructive",
+                            })
                           }
                         }}
                       >
@@ -658,7 +714,7 @@ export default function AdminDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 border-red-200 hover:bg-red-50"
+                        className="text-red-600 border-red-200 hover:bg-red-50 rounded-lg"
                         onClick={async (e) => {
                           e.stopPropagation()
                           try {
@@ -688,11 +744,11 @@ export default function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden">
             <CardContent className="pt-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Statistik Pengunjung</h3>
-                <div className="text-sm text-green-500 font-medium flex items-center gap-1">
+                <div className="text-sm text-green-500 font-medium flex items-center gap-1 bg-green-50 px-3 py-1 rounded-full">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   {realTimeVisitors.length} pengunjung online
                 </div>
@@ -726,18 +782,17 @@ export default function AdminDashboard() {
             <CardContent className="pt-6">
               <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
               {serviceData.length > 0 ? (
-                <div className="h-80">
-                  <BarChart
-                    className="h-80"
+                <div className="h-72">
+                  <DonutChart
+                    className="h-72"
                     data={serviceData}
+                    category="value"
                     index="name"
-                    categories={["value"]}
                     colors={serviceData.map((item) => item.color)}
                     valueFormatter={(number) => `${number} kunjungan`}
-                    showLegend={false}
                     showAnimation
-                    layout="vertical"
-                    yAxisWidth={120}
+                    showTooltip
+                    showLabel
                   />
                 </div>
               ) : (
@@ -747,16 +802,16 @@ export default function AdminDashboard() {
               )}
               {/* Service legend */}
               {serviceData.length > 0 && (
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="mt-4 grid grid-cols-3 gap-2">
                   {serviceData.map((service, index) => (
                     <Button
                       key={index}
                       variant="ghost"
                       size="sm"
-                      className="justify-start hover:bg-gray-100"
+                      className="justify-start hover:bg-gray-100 rounded-lg"
                       onClick={() => handleServiceClick(service)}
                     >
-                      <div className={`w-3 h-3 rounded-full bg-${service.color}-500 mr-2`}></div>
+                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
                       <span className="truncate">{service.name}</span>
                     </Button>
                   ))}
@@ -789,33 +844,69 @@ export default function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
-          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden bg-gradient-to-br from-blue-50 to-white">
             <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">Pengunjung Aktif Saat Ini</h3>
-              <div className="overflow-x-auto">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Users className="h-5 w-5 mr-2 text-blue-500" />
+                Pengunjung Aktif Saat Ini
+                <div className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                  Live
+                </div>
+              </h3>
+              <div className="overflow-x-auto rounded-lg border">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left pb-2 font-medium">Lokasi</th>
-                      <th className="text-left pb-2 font-medium">Browser</th>
-                      <th className="text-left pb-2 font-medium">Perangkat</th>
-                      <th className="text-left pb-2 font-medium">Halaman Saat Ini</th>
-                      <th className="text-left pb-2 font-medium">Terakhir Aktif</th>
+                    <tr className="bg-gray-50">
+                      <th className="text-left py-2 px-3 font-medium">Lokasi</th>
+                      <th className="text-left py-2 px-3 font-medium">Browser</th>
+                      <th className="text-left py-2 px-3 font-medium">Perangkat</th>
+                      <th className="text-left py-2 px-3 font-medium">Halaman Saat Ini</th>
+                      <th className="text-left py-2 px-3 font-medium">Terakhir Aktif</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {realTimeVisitors.map((visitor) => (
-                      <tr key={visitor.id} className="border-b last:border-b-0">
-                        <td className="py-3">
-                          {visitor.city && visitor.city !== "Unknown" ? `${visitor.city}, ` : ""}
-                          {visitor.country || "Unknown"}
+                    {realTimeVisitors.map((visitor, index) => (
+                      <tr
+                        key={visitor.id}
+                        className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors duration-150`}
+                      >
+                        <td className="py-2 px-3">
+                          <div className="flex items-center">
+                            <Globe className="h-4 w-4 mr-2 text-gray-400" />
+                            {visitor.city && visitor.city !== "Unknown" ? `${visitor.city}, ` : ""}
+                            {visitor.country || "Unknown"}
+                          </div>
                         </td>
-                        <td className="py-3">{visitor.browser || "Unknown"}</td>
-                        <td className="py-3">{visitor.device || "desktop"}</td>
-                        <td className="py-3 max-w-[200px] truncate">{visitor.currentPage}</td>
-                        <td className="py-3">{format(new Date(visitor.lastActive), "HH:mm:ss")}</td>
+                        <td className="py-2 px-3">{visitor.browser || "Unknown"}</td>
+                        <td className="py-2 px-3">
+                          <div className="flex items-center">
+                            {visitor.device === "mobile" ? (
+                              <Smartphone className="h-4 w-4 mr-1 text-gray-400" />
+                            ) : visitor.device === "tablet" ? (
+                              <Tablet className="h-4 w-4 mr-1 text-gray-400" />
+                            ) : (
+                              <Monitor className="h-4 w-4 mr-1 text-gray-400" />
+                            )}
+                            {visitor.device || "desktop"}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3 max-w-[200px] truncate">{visitor.currentPage}</td>
+                        <td className="py-2 px-3">
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 mr-1 text-gray-400" />
+                            {format(new Date(visitor.lastActive), "HH:mm:ss")}
+                          </div>
+                        </td>
                       </tr>
                     ))}
+                    {realTimeVisitors.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-gray-500">
+                          Tidak ada pengunjung aktif saat ini
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -823,6 +914,71 @@ export default function AdminDashboard() {
           </Card>
         </motion.div>
       )}
+
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-6 w-6 text-green-500" />
+              Testimoni Disetujui
+            </DialogTitle>
+            <DialogDescription>
+              Testimoni dari <span className="font-medium">{approvedTestimonial?.name}</span> telah berhasil disetujui
+              dan akan ditampilkan di website.
+            </DialogDescription>
+          </DialogHeader>
+
+          {approvedTestimonial && (
+            <div className="bg-green-50 border border-green-100 rounded-lg p-4 my-2 overflow-hidden">
+              <div className="flex items-start gap-3">
+                <div className="relative h-10 w-10 flex-shrink-0">
+                  <Image
+                    src={approvedTestimonial.imageUrl || "/placeholder.svg"}
+                    alt={approvedTestimonial.name}
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">{approvedTestimonial.name}</p>
+                  <div className="flex mt-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${i < approvedTestimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-700 mt-1 line-clamp-3 break-words whitespace-normal overflow-hidden">
+                    "{approvedTestimonial.message}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex sm:justify-between gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSuccessModal(false)
+                fetchPendingTestimonials()
+              }}
+            >
+              Segarkan Daftar
+            </Button>
+            <Button
+              onClick={() => {
+                setShowSuccessModal(false)
+                router.push("/admin/testimonials")
+              }}
+            >
+              Lihat Semua Testimoni
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -18,6 +18,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<any[]>([])
@@ -25,6 +33,8 @@ export default function TestimonialsPage() {
   const [isApproving, setIsApproving] = useState<string | null>(null)
   const [isRejecting, setIsRejecting] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [approvedTestimonial, setApprovedTestimonial] = useState<any>(null)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -75,6 +85,11 @@ export default function TestimonialsPage() {
       if (!response.ok) {
         throw new Error("Failed to approve testimonial")
       }
+
+      // Find the approved testimonial to display in the modal
+      const testimonial = testimonials.find((t) => t.id === id)
+      setApprovedTestimonial(testimonial)
+      setShowSuccessModal(true)
 
       toast({
         title: "Berhasil",
@@ -157,10 +172,7 @@ export default function TestimonialsPage() {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-      />
+      <Star key={i} className={`h-4 w-4 ${i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
     ))
   }
 
@@ -202,8 +214,8 @@ export default function TestimonialsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {pendingTestimonials.map((testimonial) => (
-              <div 
-                key={testimonial.id} 
+              <div
+                key={testimonial.id}
                 className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-full overflow-hidden"
               >
                 <div className="flex items-start gap-4">
@@ -219,13 +231,9 @@ export default function TestimonialsPage() {
                     <div className="flex justify-between gap-2">
                       <div className="min-w-0">
                         <h3 className="font-semibold truncate">{testimonial.name}</h3>
-                        <p className="text-sm text-gray-500 truncate">
-                          {testimonial.position || "Pelanggan"}
-                        </p>
+                        <p className="text-sm text-gray-500 truncate">{testimonial.position || "Pelanggan"}</p>
                       </div>
-                      <div className="flex flex-shrink-0">
-                        {renderStars(testimonial.rating)}
-                      </div>
+                      <div className="flex flex-shrink-0">{renderStars(testimonial.rating)}</div>
                     </div>
                     <div className="mt-2">
                       <p className="text-gray-700 whitespace-normal break-words line-clamp-4">
@@ -276,10 +284,7 @@ export default function TestimonialsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {approvedTestimonials.map((testimonial) => (
-              <div 
-                key={testimonial.id} 
-                className="bg-white border rounded-lg p-4 max-w-full overflow-hidden"
-              >
+              <div key={testimonial.id} className="bg-white border rounded-lg p-4 max-w-full overflow-hidden">
                 <div className="flex items-start gap-4">
                   <div className="relative h-12 w-12 flex-shrink-0">
                     <Image
@@ -293,13 +298,9 @@ export default function TestimonialsPage() {
                     <div className="flex justify-between gap-2">
                       <div className="min-w-0">
                         <h3 className="font-semibold truncate">{testimonial.name}</h3>
-                        <p className="text-sm text-gray-500 truncate">
-                          {testimonial.position || "Pelanggan"}
-                        </p>
+                        <p className="text-sm text-gray-500 truncate">{testimonial.position || "Pelanggan"}</p>
                       </div>
-                      <div className="flex flex-shrink-0">
-                        {renderStars(testimonial.rating)}
-                      </div>
+                      <div className="flex flex-shrink-0">{renderStars(testimonial.rating)}</div>
                     </div>
                     <div className="mt-2">
                       <p className="text-gray-700 whitespace-normal break-words line-clamp-4">
@@ -307,9 +308,7 @@ export default function TestimonialsPage() {
                       </p>
                     </div>
                     <div className="flex justify-between items-center mt-3">
-                      <p className="text-xs text-gray-400">
-                        Disetujui pada {formatDate(testimonial.updatedAt)}
-                      </p>
+                      <p className="text-xs text-gray-400">Disetujui pada {formatDate(testimonial.updatedAt)}</p>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -325,8 +324,8 @@ export default function TestimonialsPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Hapus Testimonial</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Apakah Anda yakin ingin menghapus testimonial dari {testimonial.name}? 
-                              Tindakan ini tidak dapat dibatalkan.
+                              Apakah Anda yakin ingin menghapus testimonial dari {testimonial.name}? Tindakan ini tidak
+                              dapat dibatalkan.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -353,13 +352,68 @@ export default function TestimonialsPage() {
               </div>
             ))}
             {approvedTestimonials.length === 0 && (
-              <div className="col-span-full py-6 text-center text-gray-500">
-                Belum ada testimoni yang disetujui.
-              </div>
+              <div className="col-span-full py-6 text-center text-gray-500">Belum ada testimoni yang disetujui.</div>
             )}
           </div>
         </CardContent>
       </Card>
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-6 w-6 text-green-500" />
+              Testimoni Disetujui
+            </DialogTitle>
+            <DialogDescription>
+              Testimoni dari <span className="font-medium">{approvedTestimonial?.name}</span> telah berhasil disetujui
+              dan akan ditampilkan di website.
+            </DialogDescription>
+          </DialogHeader>
+
+          {approvedTestimonial && (
+            <div className="bg-green-50 border border-green-100 rounded-lg p-4 my-2">
+              <div className="flex items-start gap-3">
+                <div className="relative h-10 w-10 flex-shrink-0">
+                  <Image
+                    src={approvedTestimonial.imageUrl || "/placeholder.svg"}
+                    alt={approvedTestimonial.name}
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">{approvedTestimonial.name}</p>
+                  <div className="flex mt-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${i < approvedTestimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-700 mt-1 line-clamp-2">"{approvedTestimonial.message}"</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex sm:justify-between gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSuccessModal(false)
+                fetchTestimonials()
+              }}
+            >
+              Segarkan Daftar
+            </Button>
+            <Button onClick={() => setShowSuccessModal(false)} className="bg-green-600 hover:bg-green-700">
+              Tutup
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

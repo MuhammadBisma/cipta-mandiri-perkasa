@@ -15,6 +15,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, Upload, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { CheckCircle2 } from "lucide-react"
 
 const categories = ["Sejarah", "Tips", "Desain", "Perawatan", "Tren", "Arsitektur", "Berita", "Lainnya"]
 
@@ -29,6 +38,8 @@ export default function NewBlogPost() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [createdArticleTitle, setCreatedArticleTitle] = useState("")
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -82,13 +93,17 @@ export default function NewBlogPost() {
         throw new Error(data.error || "Gagal membuat artikel")
       }
 
+      // Store the created article title for the success modal
+      setCreatedArticleTitle(title)
+
+      // Show success modal instead of immediately redirecting
+      setShowSuccessModal(true)
+
+      // Still show toast
       toast({
         title: "Berhasil",
         description: "Artikel berhasil dibuat",
       })
-
-      router.push("/admin/blog")
-      router.refresh()
     } catch (error) {
       toast({
         title: "Error",
@@ -100,6 +115,21 @@ export default function NewBlogPost() {
     }
   }
 
+  // Add a function to handle creating another article
+  const handleCreateAnother = () => {
+    // Reset form
+    setTitle("")
+    setExcerpt("")
+    setContent("")
+    setCategory("")
+    setPublished(false)
+    setImage(null)
+    setImagePreview(null)
+
+    // Close modal
+    setShowSuccessModal(false)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -108,10 +138,7 @@ export default function NewBlogPost() {
           <p className="text-gray-500">Buat artikel blog baru untuk website Cipta Mandiri Perkasa</p>
         </div>
         <Link href="/admin/blog">
-          <Button 
-          variant="outline"
-          className="rounded-xl border-gray-300 hover:bg-gray-50 hover:text-gray-900"
-          >
+          <Button variant="outline" className="rounded-xl border-gray-300 hover:bg-gray-50 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali
           </Button>
@@ -181,20 +208,16 @@ export default function NewBlogPost() {
                 <div className="space-y-2">
                   <Label htmlFor="category">Kategori</Label>
                   <Select value={category} onValueChange={setCategory} required>
-                  <SelectTrigger className="bg-white rounded-xl hover:bg-white focus:bg-white data-[state=open]:bg-white">
-                  <SelectValue placeholder="Pilih kategori" />
-                  </SelectTrigger>
+                    <SelectTrigger className="bg-white rounded-xl hover:bg-white focus:bg-white data-[state=open]:bg-white">
+                      <SelectValue placeholder="Pilih kategori" />
+                    </SelectTrigger>
                     <SelectContent className="bg-white mt-1">
                       {categories.map((cat) => (
-                        <SelectItem 
-                        key={cat} 
-                        value={cat}
-                        className="hover:bg-gray-100 focus:bg-gray-100"
-                      >
-                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                        <SelectItem key={cat} value={cat} className="hover:bg-gray-100 focus:bg-gray-100">
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
               </CardContent>
@@ -252,6 +275,43 @@ export default function NewBlogPost() {
           </div>
         </div>
       </form>
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+              <span>Artikel Berhasil Dibuat</span>
+            </DialogTitle>
+            <DialogDescription>
+              Artikel <span className="font-medium">"{createdArticleTitle}"</span> telah berhasil dibuat dan{" "}
+              {published ? "dipublikasikan" : "disimpan sebagai draft"}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            <div className="rounded-full bg-green-50 p-3">
+              <div className="rounded-full bg-green-100 p-3">
+                <CheckCircle2 className="h-10 w-10 text-green-500" />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex sm:justify-between gap-4">
+            <Button type="button" variant="outline" onClick={handleCreateAnother} className="flex-1 rounded-xl">
+              Buat Artikel Lain
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                router.push("/admin/blog")
+                router.refresh()
+              }}
+              className="flex-1 bg-primary rounded-xl"
+            >
+              Kembali ke Daftar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
