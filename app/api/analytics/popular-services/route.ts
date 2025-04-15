@@ -66,15 +66,14 @@ export async function GET(request: Request) {
       }
     })
 
-    // If we don't have enough data, add default services
     const defaultServices = [
-      { name: "Kubah Masjid", value: 45, path: "/services/kubah-masjid" },
+      { name: "Kubah Masjid", value: 45, path: "/services/kubah" },
       { name: "Mimbar", value: 38, path: "/services/mimbar" },
       { name: "Menara", value: 32, path: "/services/menara" },
       { name: "Kerawangan", value: 28, path: "/services/kerawangan" },
       { name: "Kaligrafi", value: 25, path: "/services/kaligrafi" },
       { name: "Ornamen", value: 20, path: "/services/ornamen" },
-      { name: "Pintu", value: 15, path: "/services/pintu" },
+      { name: "Masjid", value: 15, path: "/services/masjid" },
     ]
 
     // Add missing services if we don't have 7

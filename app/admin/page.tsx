@@ -155,13 +155,13 @@ export default function AdminDashboard() {
 
       // Return default data in case of error
       const defaultServices = [
-        { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah-masjid" },
+        { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah" },
         { name: "Mimbar", value: 38, color: serviceColors[1], path: "/services/mimbar" },
         { name: "Menara", value: 32, color: serviceColors[2], path: "/services/menara" },
         { name: "Kerawangan", value: 28, color: serviceColors[3], path: "/services/kerawangan" },
         { name: "Kaligrafi", value: 25, color: serviceColors[4], path: "/services/kaligrafi" },
         { name: "Ornamen", value: 20, color: serviceColors[5], path: "/services/ornamen" },
-        { name: "Pintu", value: 15, color: serviceColors[6], path: "/services/pintu" },
+        { name: "Masjid", value: 15, color: serviceColors[6], path: "/services/masjid" },
       ]
 
       setServiceData(defaultServices)
@@ -302,13 +302,13 @@ export default function AdminDashboard() {
 
       // Set fallback data for services
       const defaultServices = [
-        { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah-masjid" },
+        { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah" },
         { name: "Mimbar", value: 38, color: serviceColors[1], path: "/services/mimbar" },
         { name: "Menara", value: 32, color: serviceColors[2], path: "/services/menara" },
         { name: "Kerawangan", value: 28, color: serviceColors[3], path: "/services/kerawangan" },
         { name: "Kaligrafi", value: 25, color: serviceColors[4], path: "/services/kaligrafi" },
         { name: "Ornamen", value: 20, color: serviceColors[5], path: "/services/ornamen" },
-        { name: "Pintu", value: 15, color: serviceColors[6], path: "/services/pintu" },
+        { name: "Masjid", value: 15, color: serviceColors[6], path: "/services/masjid" },
       ]
 
       setServiceData(defaultServices)

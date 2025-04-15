@@ -17,14 +17,14 @@ export default function Footer() {
               className="h-10 w-auto mb-4"
             />
             <div className="flex flex-col">
-        <span className="ml-2 font-semibold text-[18px] leading-tight">
-          <span className="text-blue-600">Cipta Mandiri</span>{' '}
-          <span className="text-yellow-500">Perkasa</span>
-        </span>
-        <span className="ml-2 text-[10px] text-gray-500 leading-tight">
-          Glassfibre Reinforced Cement Interior & Exterior Finishing
-        </span>
-      </div>
+              <span className="ml-2 font-semibold text-[18px] leading-tight">
+                <span className="text-blue-600">Cipta Mandiri</span>{' '}
+                <span className="text-yellow-500">Perkasa</span>
+              </span>
+              <span className="ml-2 text-[10px] text-gray-500 leading-tight">
+                Glassfibre Reinforced Cement Interior & Exterior Finishing
+              </span>
+            </div>
             <p className="text-sm mt-4 mb-6">
               Spesialis pembuatan Masjid, Kubah Masjid, Mimbar Masjid, Menara Masjid, Kerawangan, Ornamen Masjid, dan awan kaligrafi dengan kualitas terbaik
               dan harga terjangkau.
