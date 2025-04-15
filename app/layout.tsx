@@ -11,6 +11,7 @@ import { Suspense } from "react"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://kubahcmp.id'),
   title: {
     template: "%s | Cipta Mandiri Perkasa",
     default: "Spesialis GRC Kubah Masjid & Ornamen Islami",

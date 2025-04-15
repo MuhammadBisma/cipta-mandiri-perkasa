@@ -1,13 +1,13 @@
-let userConfig = undefined
+let userConfig = undefined;
 try {
-  // try to import ESM first
-  userConfig = await import('./v0-user-next.config.mjs')
+  // Try to import ESM config first
+  userConfig = await import('./v0-user-next.config.mjs');
 } catch (e) {
   try {
-    // fallback to CJS import
-    userConfig = await import("./v0-user-next.config");
+    // Fallback to CJS config
+    userConfig = await import('./v0-user-next.config');
   } catch (innerError) {
-    // ignore error
+    // Ignore error
   }
 }
 
@@ -27,12 +27,40 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-}
+  // ✅ Atur Cache-Control untuk menghindari cache lama
+  async headers() {
+    return [
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store',
+          },
+        ],
+      },
+      {
+        source: '/_next/image(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store',
+          },
+        ],
+      },
+    ];
+  },
+
+  // ✅ Fallback page error agar tidak blank saat chunk gagal
+  // (Opsional)
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000, // 25 seconds
+    pagesBufferLength: 5,
+  },
+};
 
 if (userConfig) {
-  // ESM imports will have a "default" property
-  const config = userConfig.default || userConfig
-
+  const config = userConfig.default || userConfig;
   for (const key in config) {
     if (
       typeof nextConfig[key] === 'object' &&
@@ -41,11 +69,11 @@ if (userConfig) {
       nextConfig[key] = {
         ...nextConfig[key],
         ...config[key],
-      }
+      };
     } else {
-      nextConfig[key] = config[key]
+      nextConfig[key] = config[key];
     }
   }
 }
 
-export default nextConfig
+export default nextConfig;
