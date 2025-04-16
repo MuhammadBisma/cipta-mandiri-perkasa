@@ -206,8 +206,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="text-lg font-medium mb-1">Telepon</h4>
-                    <p className="text-gray-600">+62 812-3456-7890</p>
-                    <p className="text-gray-600">+62 812-3456-7890</p>
+                    <p className="text-gray-600">+62 813-8622-5702</p>
+                    <p className="text-gray-600">+62 813-8622-5702</p>
                   </div>
                 </div>
 
