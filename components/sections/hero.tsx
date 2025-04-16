@@ -23,7 +23,7 @@ const slides = [
     title: "Mimbar Berkualitas",
     subtitle: "Dengan Sentuhan Artistik Nan Elegan",
     description: "Desain mimbar masjid yang elegan, fungsional, dan tahan lama",
-    highlightColor: "from-yellow-400 to-yellow-600",
+    highlightColor: "from-blue-400 to-blue-600",
   },
   {
     id: 3,

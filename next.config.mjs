@@ -20,31 +20,124 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    // Konfigurasi untuk gambar
+    unoptimized: true, // Penting untuk deployment di VPS
+    domains: [
+      'res.cloudinary.com', 
+      'kubahcmp.id', 
+      'www.kubahcmp.id'
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60, // Cache gambar minimal 60 detik
+    dangerouslyAllowSVG: true, // Izinkan SVG (hati-hati dengan ini)
   },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  // Output standalone untuk deployment di VPS
+  output: 'standalone',
+  
   // ✅ Atur Cache-Control untuk menghindari cache lama
   async headers() {
     return [
       {
-        source: '/_next/static/(.*)',
+        source: '/_next/static/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'no-store',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
       {
-        source: '/_next/image(.*)',
+        source: '/_next/image/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'no-store',
+            value: 'public, max-age=86400, stale-while-revalidate=31536000',
+          },
+        ],
+      },
+      {
+        // Untuk file statis di folder public
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Untuk file media - menggunakan format yang benar
+        source: '/:path*.jpg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.jpeg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.gif',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.svg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.webp',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
@@ -52,11 +145,19 @@ const nextConfig = {
   },
 
   // ✅ Fallback page error agar tidak blank saat chunk gagal
-  // (Opsional)
   onDemandEntries: {
     maxInactiveAge: 25 * 1000, // 25 seconds
     pagesBufferLength: 5,
   },
+  
+  // Konfigurasi webpack tambahan untuk menangani gambar dengan lebih baik
+  webpack(config) {
+    return config;
+  },
+  
+  // Konfigurasi untuk menangani error saat runtime
+  reactStrictMode: true,
+  poweredByHeader: false, // Hapus header X-Powered-By untuk keamanan
 };
 
 if (userConfig) {
