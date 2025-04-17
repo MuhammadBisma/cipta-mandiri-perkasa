@@ -294,26 +294,26 @@ export default function Contact() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="name">Nama Lengkap</Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Nama Anda" />
                   {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Email Anda" />
                   {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="phone">Nomor Telepon</Label>
-                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Nomor Telepon Anda" />
                   {errors.phone && <p className="text-sm text-red-500 mt-1">{errors.phone}</p>}
                 </div>
               </div>
 
               <div>
                 <Label htmlFor="message">Pesan</Label>
-                <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
+                <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Pesan Anda" />
                 {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
               </div>
 
