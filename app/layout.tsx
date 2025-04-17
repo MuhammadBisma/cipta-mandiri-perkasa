@@ -286,6 +286,28 @@ export const metadata: Metadata = {
     "harga kubah grc",
     "grc kubah",
   ],
+  openGraph: {
+    title: "Spesialis GRC Kubah Masjid & Ornamen Islami",
+    description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    url: "https://kubahcmp.id",
+    siteName: "Cipta Mandiri Perkasa",
+    images: [
+      {
+        url: "https://kubahcmp.id/images/og-image.jpg", 
+        width: 1200,
+        height: 630,
+        alt: "Cipta Mandiri Perkasa",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Spesialis GRC Kubah Masjid & Ornamen Islami",
+    description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi.",
+    images: ["https://kubahcmp.id/images/og-image.jpg"],
+  },
+  
   authors: [{ name: "Cipta Mandiri Perkasa" }],
   creator: "Cipta Mandiri Perkasa",
   publisher: "Cipta Mandiri Perkasa",
