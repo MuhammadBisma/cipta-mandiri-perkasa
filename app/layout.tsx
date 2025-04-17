@@ -8,7 +8,6 @@ import PageViewTracker from "@/components/analytics/page-view-tracker"
 import FloatingContactButton from "@/components/floating-contact-button"
 import { Suspense } from "react"
 import StructuredData from "@/components/seo/structured-data"
-import ErrorBoundary from "@/components/error-boundary"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
     default: "Spesialis GRC Kubah Masjid & Ornamen Islami",
   },
   description:
-    "Cipta Mandiri Perkasa adalah perusahaan spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
   keywords: [
     "kubah masjid",
     "mimbar masjid",
@@ -77,8 +76,6 @@ export const metadata: Metadata = {
     "menara group",
     "menara bca green building",
     "menara great eastern",
-    "menara arcadia",
-    "menara greenview",
     "menara great eastern 2",
     "menara great eastern 2 address",
     "menara great eastern kl",
@@ -372,16 +369,22 @@ export default function RootLayout({
       </Script>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <ErrorBoundary>
-            {children}
-            <Suspense fallback={null}>
-              <PageViewTracker />
-            </Suspense>
-            <FloatingContactButton />
-            <StructuredData type="LocalBusiness" title={""} description={""} />
-          </ErrorBoundary>
+          {children}
+          <Suspense fallback={null}>
+            <PageViewTracker />
+          </Suspense>
+          <FloatingContactButton />
+          <StructuredData
+            type="LocalBusiness"
+            title="Cipta Mandiri Perkasa"
+            description="Spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan ornamen islami dengan kualitas terbaik."
+          />
         </ThemeProvider>
       </body>
     </html>
   )
 }
+
+import "./globals.css"
+
+import "./globals.css"

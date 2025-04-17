@@ -12,11 +12,11 @@ import Footer from "@/components/layout/footer"
 export const metadata: Metadata = {
   title: "Cipta Mandiri Perkasa - Spesialis Kubah Masjid & Ornamen Islami",
   description:
-    "Cipta Mandiri Perkasa adalah perusahaan spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
   openGraph: {
     title: "Cipta Mandiri Perkasa - Spesialis Kubah Masjid & Ornamen Islami",
     description:
-      "Cipta Mandiri Perkasa adalah perusahaan spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+      "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
     images: [
       {
         url: "/images/og-image.jpg",

@@ -67,7 +67,6 @@ export default function Hero() {
       return () => clearInterval(interval)
     } catch (error) {
       console.error("Error in slide interval:", error)
-      // Fallback ke slide pertama jika terjadi error
       setCurrentSlide(0)
     }
   }, [])
@@ -87,9 +86,9 @@ export default function Hero() {
 
   return (
     <ErrorBoundary>
-      <section id="hero" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+      <section id="hero" className="relative min-h-screen flex items-center pt-16 w-full overflow-x-hidden">
         {/* Background Slideshow */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 w-full">
           {slides.map((slide, index) => (
             <div
               key={slide.id}
@@ -100,11 +99,11 @@ export default function Hero() {
                 alt={slide.title}
                 fill
                 priority
-                className="object-cover"
+                className="object-cover w-full"
                 quality={100}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 onError={(e) => {
                   console.error(`Error loading image: ${slide.image}`)
-                  // Fallback ke gambar default jika terjadi error
                   e.currentTarget.src = "/placeholder.svg"
                 }}
               />
@@ -115,12 +114,12 @@ export default function Hero() {
         </div>
 
         {/* Content */}
-        <div className="container relative z-10 mx-auto px-4 py-12 md:py-24">
-          <div className="max-w-3xl text-white">
+        <div className="container relative z-10 mx-auto px-4 sm:px-6 py-12 md:py-24 w-full max-w-screen">
+          <div className="max-w-3xl text-white px-2 sm:px-0 w-full">
             <div className="mb-6"></div>
 
-            {/* Single set of text elements that animate between states */}
-            <div className="relative h-48 md:h-64 lg:h-80 mb-6 overflow-hidden">
+            {/* Text Animation */}
+            <div className="relative h-32 sm:h-48 md:h-64 lg:h-80 mb-6 w-full">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={slides[currentSlide].id}
@@ -130,7 +129,7 @@ export default function Hero() {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="absolute top-0 left-0 w-full"
                 >
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                     <span className="text-white">{slides[currentSlide].title}</span>
                     <br />
                     <span
@@ -143,8 +142,8 @@ export default function Hero() {
               </AnimatePresence>
             </div>
 
-            {/* Description with cleaner styling */}
-            <div className="relative h-20 mb-10 overflow-hidden">
+            {/* Description */}
+            <div className="relative h-16 sm:h-20 mb-8 sm:mb-10 w-full">
               <AnimatePresence mode="wait">
                 <motion.p
                   key={slides[currentSlide].id}
@@ -152,19 +151,20 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute top-0 left-0 text-lg md:text-xl text-white max-w-2xl leading-relaxed"
+                  className="absolute top-0 left-0 text-base sm:text-lg md:text-xl text-white w-full max-w-2xl leading-relaxed"
                 >
-                  <span className="bg-primary/80 px-4 py-2 rounded-lg">{slides[currentSlide].description}</span>
+                  <span className="bg-primary/80 px-3 sm:px-4 py-1 sm:py-2 rounded-lg inline-block">
+                    {slides[currentSlide].description}
+                  </span>
                 </motion.p>
               </AnimatePresence>
             </div>
 
-            {/* Buttons - Responsive layout */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-16 w-full">
-              {/* WhatsApp Button - always visible */}
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-12 sm:mb-16 w-full px-2 sm:px-0">
               <Button
                 onClick={openWhatsApp}
-                className="rounded-full px-4 sm:px-6 py-4 sm:py-5 text-sm sm:text-base font-bold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg transition-all flex items-center justify-center flex-1 w-full"
+                className="rounded-full px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-bold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg transition-all flex items-center justify-center flex-1 w-full"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -179,11 +179,10 @@ export default function Hero() {
                 </span>
               </Button>
 
-              {/* Phone Button - only on mobile */}
               {isMobile && (
                 <Button
                   onClick={handleCall}
-                  className="rounded-full px-4 py-4 text-sm font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all flex items-center justify-center flex-1 w-full"
+                  className="rounded-full px-4 py-3 text-sm font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all flex items-center justify-center flex-1 w-full"
                 >
                   <Phone className="h-4 w-4 mr-2" />
                   <span aria-label="Hubungi via Telpon" className="truncate">
@@ -192,29 +191,27 @@ export default function Hero() {
                 </Button>
               )}
 
-              {/* Portfolio Button - only on desktop when not mobile */}
               {!isMobile && (
                 <Link href="/gallery" className="flex-1 w-full">
                   <Button
                     variant="outline"
-                    className="rounded-full w-full px-6 py-5 text-base font-medium border-2 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-blue-500/20 group"
+                    className="rounded-full w-full px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-2 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <span className="relative z-10 flex items-center justify-center w-full">
                       <span className="truncate">Lihat Portofolio</span>
-                      <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 sm:ml-3 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </Button>
                 </Link>
               )}
             </div>
 
-            {/* On mobile, show portfolio button below */}
             {isMobile && (
-              <div className="w-full mb-8">
+              <div className="w-full mb-8 px-2">
                 <Link href="/gallery">
                   <Button
                     variant="outline"
-                    className="rounded-full w-full px-4 py-4 text-sm font-medium border-2 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-blue-500/20 group"
+                    className="rounded-full w-full px-4 py-3 text-sm font-medium border-2 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <span className="relative z-10 flex items-center justify-center w-full">
                       <span className="truncate">Lihat Portofolio</span>
@@ -225,7 +222,7 @@ export default function Hero() {
               </div>
             )}
 
-            {/* Centered Slide Indicators */}
+            {/* Slide Indicators */}
             <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
               <div className="flex gap-2">
                 {slides.map((slide, index) => (
@@ -235,11 +232,11 @@ export default function Hero() {
                     className={`h-2 rounded-full transition-all duration-300 ${
                       index === currentSlide
                         ? slide.highlightColor.includes("blue")
-                          ? "bg-blue-400 w-8 sm:w-12"
+                          ? "bg-blue-400 w-6 sm:w-8 md:w-12"
                           : slide.highlightColor.includes("yellow")
-                            ? "bg-yellow-400 w-8 sm:w-12"
-                            : "bg-white w-8 sm:w-12"
-                        : "bg-white/30 w-4 sm:w-6"
+                            ? "bg-yellow-400 w-6 sm:w-8 md:w-12"
+                            : "bg-white w-6 sm:w-8 md:w-12"
+                        : "bg-white/30 w-3 sm:w-4 md:w-6"
                     }`}
                     aria-label={`Go to slide ${index + 1}`}
                   />
@@ -251,14 +248,14 @@ export default function Hero() {
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 text-white flex flex-col items-center"
+          className="absolute bottom-8 sm:bottom-10 left-1/2 transform -translate-x-1/2 z-10 text-white flex flex-col items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.8 }}
         >
-          <span className="text-sm mb-2">Scroll untuk melihat</span>
-          <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}>
-            <ChevronDown className="h-6 w-6" />
+          <span className="text-xs sm:text-sm mb-1 sm:mb-2">Scroll untuk melihat</span>
+          <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}>
+            <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6" />
           </motion.div>
         </motion.div>
       </section>
