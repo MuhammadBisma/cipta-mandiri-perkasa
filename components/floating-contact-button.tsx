@@ -63,12 +63,12 @@ export default function FloatingContactButton() {
   }, [isVisible, isOpen])
 
   const handleCall = () => {
-    window.location.href = "tel:+6285218729008"
+    window.location.href = "tel:+6281386225702"
     setIsOpen(false)
   }
 
   const handleWhatsApp = () => {
-    window.open("https://wa.me/6285218729008", "_blank")
+    window.open("https://wa.me/6281386225702", "_blank")
     setIsOpen(false)
   }
 
