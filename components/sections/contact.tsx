@@ -294,30 +294,30 @@ export default function Contact() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="name">Nama Lengkap</Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
                   {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
                   {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="phone">Nomor Telepon</Label>
-                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
                   {errors.phone && <p className="text-sm text-red-500 mt-1">{errors.phone}</p>}
                 </div>
               </div>
 
               <div>
                 <Label htmlFor="message">Pesan</Label>
-                <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} />
+                <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all"/>
                 {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
               </div>
 
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting} className="rounded-xl px-6 py-2 flex items-center gap-2">
                 {isSubmitting ? "Mengirim..." : "Kirim Pesan"}
                 <Send className="ml-2 h-4 w-4" />
               </Button>
@@ -329,16 +329,16 @@ export default function Contact() {
         <div id="map-container" className="mt-16">
           {mapLoaded && (
             <div className="w-full h-[500px] rounded-3xl overflow-hidden shadow-lg border border-gray-200">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.356803346293!2d107.0882966!3d-6.2153456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698b89b20d34e3%3A0x9a9b3cabc7eae08!2sJl.%20Raya%20Tambelang%2C%20Kertamukti%2C%20Cibitung%2C%20Bekasi%2C%20Jawa%20Barat%2017520!5e0!3m2!1sen!2sid!4v1713273380000!5m2!1sen!2sid"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
-            </div>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2925248538536!2d107.11352067316736!3d-6.225107560963205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69854f9b8a9187%3A0x639e660cbd4dacdf!2sCipta%20Mandiri%20Perkasa!5e0!3m2!1sid!2sid!4v1744917216045!5m2!1sid!2sid"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
           )}
         </div>
       </div>
