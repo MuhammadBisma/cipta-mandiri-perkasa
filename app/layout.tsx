@@ -338,10 +338,10 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/icons/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+        <link rel="icon" href="/icons/favicon.ico?v=2" sizes="any" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=2" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png?v=2" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png?v=2" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="facebook-domain-verification" content="your-facebook-verification-code" />
@@ -353,7 +353,7 @@ export default function RootLayout({
               "@type": "Organization",
               name: "Cipta Mandiri Perkasa",
               url: "https://kubahcmp.id",
-              logo: "https://kubahcmp.id/images/logo.png",
+              logo: "https://kubahcmp.id/images/logo.png?v=2",
               contactPoint: {
                 "@type": "ContactPoint",
                 telephone: "+6281510655126",
