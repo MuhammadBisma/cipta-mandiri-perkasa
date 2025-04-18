@@ -1,5 +1,6 @@
 import Script from "next/script"
 
+// Pastikan interface StructuredDataProps memiliki properti 'type' dengan tipe yang benar
 type StructuredDataType = "WebPage" | "Article" | "Product" | "Service" | "Organization" | "LocalBusiness" | "FAQPage"
 
 interface StructuredDataProps {
@@ -12,6 +13,7 @@ interface StructuredDataProps {
   authorName?: string
   organizationName?: string
   url?: string
+  breadcrumbs?: Array<{ name: string; item: string }>
 }
 
 export default function StructuredData({
@@ -24,6 +26,7 @@ export default function StructuredData({
   authorName,
   organizationName = "Cipta Mandiri Perkasa",
   url,
+  breadcrumbs,
 }: StructuredDataProps) {
   let structuredData = {}
 
@@ -94,8 +97,8 @@ export default function StructuredData({
       structuredData = {
         "@context": "https://schema.org",
         "@type": "Organization",
-        name: organizationName,
-        url: "https://kubahcmp.id",
+        name: organizationName || title,
+        url: url || "https://kubahcmp.id",
         logo: "https://kubahcmp.id/logo.png",
         contactPoint: {
           "@type": "ContactPoint",
@@ -113,21 +116,21 @@ export default function StructuredData({
       structuredData = {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
-        name: organizationName,
-        image: "https://kubahcmp.id/logo.png",
-        url: "https://kubahcmp.id",
+        name: organizationName || title,
+        image: imageUrl || "https://kubahcmp.id/logo.png",
+        url: url || "https://kubahcmp.id",
         telephone: "+6281234567890",
         address: {
           "@type": "PostalAddress",
-          streetAddress: "Jl. Contoh No. 123",
-          addressLocality: "Jakarta",
-          postalCode: "12345",
+          streetAddress: "Kp.pisang, batu, Jl. Raya Tambelang No.RT.02",
+          addressLocality: "Kertamukti, Kec. Cibitung, Kabupaten Bekasi",
+          postalCode: "17520",
           addressCountry: "ID",
         },
         geo: {
           "@type": "GeoCoordinates",
-          latitude: "-6.2088",
-          longitude: "106.8456",
+          latitude: "-6.2153456",
+          longitude: "107.0882966",
         },
         openingHoursSpecification: [
           {
@@ -143,6 +146,13 @@ export default function StructuredData({
             closes: "15:00",
           },
         ],
+      }
+      break
+    case "FAQPage":
+      structuredData = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: breadcrumbs || [],
       }
       break
     default:

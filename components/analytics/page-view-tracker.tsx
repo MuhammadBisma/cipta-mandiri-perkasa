@@ -57,11 +57,16 @@ export default function PageViewTracker({ blogPostId, galleryId }: PageViewTrack
         }
       } catch (error) {
         console.error("Error tracking page view:", error)
+        // Tidak perlu throw error di sini, cukup log saja
+        // Ini mencegah error di komponen ini mengganggu rendering aplikasi
       }
     }
 
     // Track the page view
-    trackPageView()
+    trackPageView().catch((err) => {
+      console.error("Failed to track page view:", err)
+      // Tangkap error dari async function untuk mencegah unhandled promise rejection
+    })
 
     // Function to update page view duration
     const updateDuration = async () => {
@@ -72,12 +77,15 @@ export default function PageViewTracker({ blogPostId, galleryId }: PageViewTrack
         await updatePageViewDurationViaAPI(pageViewId.current, duration)
       } catch (error) {
         console.error("Error updating page view duration:", error)
+        // Tidak perlu throw error di sini
       }
     }
 
     // Update duration when the component unmounts or when the path changes
     return () => {
-      updateDuration()
+      updateDuration().catch((err) => {
+        console.error("Failed to update duration:", err)
+      })
     }
   }, [pathname, searchParams, blogPostId, galleryId])
 
@@ -89,13 +97,18 @@ export default function PageViewTracker({ blogPostId, galleryId }: PageViewTrack
       const duration = Math.floor((Date.now() - startTime.current) / 1000)
 
       // Use our client-safe function to send the beacon
-      sendPageViewDurationViaBeacon(pageViewId.current, duration)
+      try {
+        sendPageViewDurationViaBeacon(pageViewId.current, duration)
+      } catch (error) {
+        console.error("Error sending beacon:", error)
+        // Tidak perlu throw error di sini
+      }
     }
 
     window.addEventListener("beforeunload", handleBeforeUnload)
 
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
+      window.removeEventListener('beforeunload", handleBeforeUnload)EventListener("beforeunload', handleBeforeUnload)
     }
   }, [])
 

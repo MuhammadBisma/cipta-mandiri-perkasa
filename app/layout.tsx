@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "Spesialis GRC Kubah Masjid & Ornamen Islami",
   },
   description:
-    "Cipta Mandiri Perkasa adalah perusahaan spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan awan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
   keywords: [
     "kubah masjid",
     "mimbar masjid",
@@ -76,8 +76,6 @@ export const metadata: Metadata = {
     "menara group",
     "menara bca green building",
     "menara great eastern",
-    "menara arcadia",
-    "menara greenview",
     "menara great eastern 2",
     "menara great eastern 2 address",
     "menara great eastern kl",
@@ -211,10 +209,6 @@ export const metadata: Metadata = {
     "grc bahan bangunan",
     "bangunan grc",
     "grc bangunan",
-    "",
-    "",
-    "",
-    "",
     "cara pembuatan kubah masjid",
     "jasa pembuat kubah",
     "pembuatan kubah",
@@ -292,6 +286,28 @@ export const metadata: Metadata = {
     "harga kubah grc",
     "grc kubah",
   ],
+  openGraph: {
+    title: "Spesialis GRC Kubah Masjid & Ornamen Islami",
+    description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    url: "https://kubahcmp.id",
+    siteName: "Cipta Mandiri Perkasa",
+    images: [
+      {
+        url: "https://kubahcmp.id/images/og-image.jpg", 
+        width: 1200,
+        height: 630,
+        alt: "Cipta Mandiri Perkasa",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Spesialis GRC Kubah Masjid & Ornamen Islami",
+    description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi.",
+    images: ["https://kubahcmp.id/images/og-image.jpg"],
+  },
+  
   authors: [{ name: "Cipta Mandiri Perkasa" }],
   creator: "Cipta Mandiri Perkasa",
   publisher: "Cipta Mandiri Perkasa",
@@ -380,11 +396,17 @@ export default function RootLayout({
             <PageViewTracker />
           </Suspense>
           <FloatingContactButton />
-          <StructuredData type="LocalBusiness" title={""} description={""} />
+          <StructuredData
+            type="LocalBusiness"
+            title="Cipta Mandiri Perkasa"
+            description="Spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan ornamen islami dengan kualitas terbaik."
+          />
         </ThemeProvider>
       </body>
     </html>
   )
 }
+
+import "./globals.css"
 
 import "./globals.css"
