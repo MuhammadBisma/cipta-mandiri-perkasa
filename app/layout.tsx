@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "Spesialis GRC Kubah Masjid & Ornamen Islami",
   },
   description:
-    "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    "Cipta Mandiri Perkasa adalah spesialis kubah masjid, masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
   keywords: [
     "kubah masjid",
     "mimbar masjid",
@@ -288,7 +288,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Spesialis GRC Kubah Masjid & Ornamen Islami",
-    description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+    description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
     url: "https://kubahcmp.id",
     siteName: "Cipta Mandiri Perkasa",
     images: [
