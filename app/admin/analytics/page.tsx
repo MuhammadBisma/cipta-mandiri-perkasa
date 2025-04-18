@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -597,6 +597,31 @@ export default function AnalyticsPage() {
                       showAnimation
                       showTooltip
                       showLabel
+                      customTooltip={(props) => {
+                        return (
+                          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
+                            <h3 className="font-semibold mb-2">Device Breakdown</h3>
+                            <p className="text-sm text-gray-500 mb-3">Visitors by device type</p>
+                            
+                            <div className="space-y-2">
+                              {props.payload?.map((item: { color: any; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; value: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
+                                <div key={index} className="flex justify-between items-center">
+                                  <div className="flex items-center">
+                                    <div 
+                                      className="h-3 w-3 rounded-full mr-2" 
+                                      style={{ backgroundColor: item.color }}
+                                    ></div>
+                                    <span className="text-sm">{item.name}</span>
+                                  </div>
+                                  <span className="text-sm font-medium">
+                                    {item.value} visitors
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }}
                     />
                     <div className="mt-4 flex flex-wrap justify-center gap-3">
                       {Object.entries(deviceColors).map(([name, color]) => (
@@ -610,35 +635,60 @@ export default function AnalyticsPage() {
                 </Card>
 
                 <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300">
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Globe className="h-5 w-5 mr-2 text-indigo-500" />
-                      Browser Breakdown
-                    </CardTitle>
-                    <CardDescription>Visitors by browser</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <DonutChart
-                      className="h-60"
-                      data={prepareBrowserDataWithColors()}
-                      category="value"
-                      index="name"
-                      colors={Object.values(browserColors)}
-                      valueFormatter={(number: number) => `${number} visitors`}
-                      showAnimation
-                      showTooltip
-                      showLabel
-                    />
-                    <div className="mt-4 flex flex-wrap justify-center gap-2">
-                      {Object.entries(browserColors).map(([name, color]) => (
-                        <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
-                          <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
-                          <span className="text-sm">{name}</span>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Globe className="h-5 w-5 mr-2 text-indigo-500" />
+                    Browser Breakdown
+                  </CardTitle>
+                  <CardDescription>Visitors by browser</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DonutChart
+                    className="h-60"
+                    data={prepareBrowserDataWithColors()}
+                    category="value"
+                    index="name"
+                    colors={Object.values(browserColors)}
+                    valueFormatter={(number: number) => `${number} visitors`}
+                    showAnimation
+                    showTooltip
+                    showLabel
+                    customTooltip={(props) => {
+                      return (
+                        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
+                          <h3 className="font-semibold mb-2">Browser Breakdown</h3>
+                          <p className="text-sm text-gray-500 mb-3">Visitors by browser</p>
+                          
+                          <div className="space-y-2">
+                            {props.payload?.map((item: { color: any; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; value: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
+                              <div key={index} className="flex justify-between items-center">
+                                <div className="flex items-center">
+                                  <div 
+                                    className="h-3 w-3 rounded-full mr-2" 
+                                    style={{ backgroundColor: item.color }}
+                                  ></div>
+                                  <span className="text-sm">{item.name}</span>
+                                </div>
+                                <span className="text-sm font-medium">
+                                  {item.value} visitors
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                      );
+                    }}
+                  />
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    {Object.entries(browserColors).map(([name, color]) => (
+                      <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
+                        <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
+                        <span className="text-sm">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
               </div>
             </>
           )}

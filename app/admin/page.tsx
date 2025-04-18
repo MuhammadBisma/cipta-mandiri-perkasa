@@ -774,52 +774,77 @@ export default function AdminDashboard() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
-              {serviceData.length > 0 ? (
-                <div className="h-72">
-                  <DonutChart
-                    className="h-72"
-                    data={serviceData}
-                    category="value"
-                    index="name"
-                    colors={serviceData.map((item) => item.color)}
-                    valueFormatter={(number) => `${number} kunjungan`}
-                    showAnimation
-                    showTooltip
-                    showLabel
-                  />
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: 0.5 }}
+>
+  <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+    <CardContent className="pt-6">
+      <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
+      {serviceData.length > 0 ? (
+        <div className="h-72">
+          <DonutChart
+            className="h-72"
+            data={serviceData}
+            category="value"
+            index="name"
+            colors={serviceData.map((item) => item.color)}
+            valueFormatter={(number) => `${number} kunjungan`}
+            showAnimation
+            showTooltip
+            showLabel
+            customTooltip={(props) => {
+              return (
+                <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
+                  <h3 className="font-semibold mb-2">Layanan Terpopuler</h3>
+                  <p className="text-sm text-gray-500 mb-3">Detail kunjungan</p>
+                  
+                  <div className="space-y-2">
+                    {props.payload?.map((item: { color: any; name: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; value: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined }, index: React.Key | null | undefined) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-3 h-3 rounded-full mr-2" 
+                            style={{ backgroundColor: item.color }}
+                          ></div>
+                          <span className="text-sm">{item.name}</span>
+                        </div>
+                        <span className="text-sm font-medium">
+                          {item.value} kunjungan
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ) : (
-                <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg">
-                  <p className="text-gray-500">Tidak ada data layanan tersedia</p>
-                </div>
-              )}
-              {/* Service legend */}
-              {serviceData.length > 0 && (
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {serviceData.map((service, index) => (
-                    <Button
-                      key={index}
-                      variant="ghost"
-                      size="sm"
-                      className="justify-start hover:bg-gray-100 rounded-lg"
-                      onClick={() => handleServiceClick(service)}
-                    >
-                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
-                      <span className="truncate">{service.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+              );
+            }}
+          />
+        </div>
+      ) : (
+        <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg">
+          <p className="text-gray-500">Tidak ada data layanan tersedia</p>
+        </div>
+      )}
+      {/* Service legend */}
+      {serviceData.length > 0 && (
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {serviceData.map((service, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              className="justify-start hover:bg-gray-100 rounded-lg"
+              onClick={() => handleServiceClick(service)}
+            >
+              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
+              <span className="truncate">{service.name}</span>
+            </Button>
+          ))}
+        </div>
+      )}
+    </CardContent>
+  </Card>
+</motion.div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
