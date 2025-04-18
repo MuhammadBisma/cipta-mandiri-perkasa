@@ -10,6 +10,7 @@ import { getSession } from "@/lib/auth"
 const prisma = new PrismaClient()
 const BACKUP_DIR = path.join(process.cwd(), "backups")
 
+// Pastikan direktori backups ada
 if (!fs.existsSync(BACKUP_DIR)) {
   fs.mkdirSync(BACKUP_DIR, { recursive: true })
 }
@@ -29,8 +30,8 @@ export async function createBackup(
     data: {
       name,
       description,
-      filePath: "", 
-      fileSize: 0, 
+      filePath: "",
+      fileSize: 0,
       fileType: "json.gz",
       tables,
       type,
@@ -171,7 +172,6 @@ export async function restoreBackup(backupId: string): Promise<boolean> {
 
     const backupData = JSON.parse(decompressed)
     await prisma.$transaction(async (tx) => {
-
       for (const table of backup.tables) {
         switch (table) {
           case "blog_posts":
@@ -266,11 +266,27 @@ export async function deleteBackup(backupId: string): Promise<boolean> {
   }
 
   try {
-    const filePath = path.join(BACKUP_DIR, backup.filePath)
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath)
+    // Perbaikan: Pastikan filePath adalah file, bukan direktori
+    if (!backup.filePath) {
+      console.warn(`Backup ${backupId} has no file path, skipping file deletion`)
+    } else {
+      const filePath = path.join(BACKUP_DIR, backup.filePath)
+
+      // Periksa apakah ini adalah file (bukan direktori) dan file tersebut ada
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        // Gunakan try-catch untuk menangani error izin
+        try {
+          fs.unlinkSync(filePath)
+        } catch (fileError) {
+          console.error(`Failed to delete backup file: ${filePath}`, fileError)
+          // Lanjutkan meskipun file tidak dapat dihapus
+        }
+      } else {
+        console.warn(`Backup file not found or is a directory: ${filePath}`)
+      }
     }
 
+    // Hapus entri dari database terlepas dari apakah file berhasil dihapus
     await prisma.backup.delete({
       where: { id: backupId },
     })
@@ -331,7 +347,6 @@ export async function updateBackupSchedule(
   time: string,
   retentionDays: number,
 ): Promise<any> {
-
   const schedule = await prisma.backupSchedule.findFirst()
   const nextRun = calculateNextRun(frequency, time)
 

@@ -15,6 +15,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Pastikan params.id diakses dengan benar
     const id = params.id
 
     // Get the backup from the database
@@ -50,7 +51,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     return NextResponse.json(formattedBackup)
   } catch (error) {
-    console.error(`Error fetching backup ${params.id}:`, error)
+    console.error(`Error fetching backup:`, error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -63,6 +64,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Pastikan params.id diakses dengan benar
     const id = params.id
 
     // Delete the backup
@@ -74,7 +76,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     return NextResponse.json({ success: true, message: `Backup ${id} deleted successfully` })
   } catch (error) {
-    console.error(`Error deleting backup ${params.id}:`, error)
+    console.error(`Error deleting backup:`, error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -87,6 +89,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Pastikan params.id diakses dengan benar
     const id = params.id
     const { action } = await request.json()
 
@@ -103,7 +106,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   } catch (error) {
-    console.error(`Error processing backup ${params.id}:`, error)
+    console.error(`Error processing backup:`, error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
