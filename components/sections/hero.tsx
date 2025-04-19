@@ -1,8 +1,9 @@
 "use client"
+
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ChevronDown, Phone } from "lucide-react"
+import { ArrowRight, Phone } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useMediaQuery } from "@/hooks/use-mobile"
 import Link from "next/link"
@@ -40,7 +41,6 @@ const whatsappMessage = "Halo, saya ingin berkonsultasi tentang..."
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [scrolled, setScrolled] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
 
   const openWhatsApp = () => {
@@ -60,28 +60,10 @@ export default function Hero() {
   }
 
   useEffect(() => {
-    try {
-      const interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % slides.length)
-      }, 5000)
-      return () => clearInterval(interval)
-    } catch (error) {
-      console.error("Error in slide interval:", error)
-      setCurrentSlide(0)
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      try {
-        setScrolled(window.scrollY > 50)
-      } catch (error) {
-        console.error("Error in scroll handler:", error)
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000)
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -116,10 +98,8 @@ export default function Hero() {
         {/* Content */}
         <div className="container relative z-10 mx-auto px-4 sm:px-6 py-12 md:py-24 w-full max-w-screen">
           <div className="max-w-3xl text-white px-2 sm:px-0 w-full">
-            <div className="mb-6"></div>
-
             {/* Text Animation */}
-            <div className="relative h-32 sm:h-48 md:h-64 lg:h-80 mb-6 w-full">
+            <div className="relative h-[120px] sm:h-48 md:h-64 lg:h-80 mb-6 w-full">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={slides[currentSlide].id}
@@ -132,9 +112,7 @@ export default function Hero() {
                   <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                     <span className="text-white">{slides[currentSlide].title}</span>
                     <br />
-                    <span
-                      className={`text-white font-extrabold ${slides[currentSlide].highlightColor.includes("yellow") ? "text-yellow-400" : "text-blue-400"}`}
-                    >
+                    <span className="text-blue-400 font-extrabold">
                       {slides[currentSlide].subtitle}
                     </span>
                   </h1>
@@ -221,43 +199,85 @@ export default function Hero() {
                 </Link>
               </div>
             )}
-
-            {/* Slide Indicators */}
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-              <div className="flex gap-2">
-                {slides.map((slide, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      index === currentSlide
-                        ? slide.highlightColor.includes("blue")
-                          ? "bg-blue-400 w-6 sm:w-8 md:w-12"
-                          : slide.highlightColor.includes("yellow")
-                            ? "bg-yellow-400 w-6 sm:w-8 md:w-12"
-                            : "bg-white w-6 sm:w-8 md:w-12"
-                        : "bg-white/30 w-3 sm:w-4 md:w-6"
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 sm:bottom-10 left-1/2 transform -translate-x-1/2 z-10 text-white flex flex-col items-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-        >
-          <span className="text-xs sm:text-sm mb-1 sm:mb-2">Scroll untuk melihat</span>
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}>
-            <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6" />
-          </motion.div>
-        </motion.div>
+        {/* Indicators Container - Responsive Positioning */}
+        <div className={`absolute ${isMobile ? 'bottom-4' : 'bottom-8'} left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-3 w-full max-w-[95vw]`}>
+          {/* Scroll Indicator - Only show on desktop */}
+          {!isMobile && (
+            <motion.div
+              className="flex flex-col items-center cursor-pointer group"
+              onClick={() => window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' })}
+              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 400, 
+                damping: 10,
+                delay: 1.5, 
+                duration: 0.8 
+              }}
+            >
+              <motion.div
+                className="w-8 h-12 sm:w-10 sm:h-14 rounded-3xl border-2 border-white/70 flex justify-center pt-2 relative"
+                animate={{
+                  borderColor: ["rgba(255,255,255,0.5)", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.5)"],
+                }}
+                transition={{
+                  repeat: Number.POSITIVE_INFINITY,
+                  duration: 2.5,
+                  ease: "easeInOut"
+                }}
+              >
+                <motion.div
+                  className="w-1 h-2 sm:h-3 bg-white rounded-full"
+                  animate={{
+                    y: [0, 6, 0],
+                    opacity: [0.6, 1, 0.6]
+                  }}
+                  transition={{
+                    repeat: Number.POSITIVE_INFINITY,
+                    duration: 1.8,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.div>
+
+              <motion.span
+                className="text-xs sm:text-sm mt-2 text-white/80 font-medium tracking-wider"
+                animate={{
+                  opacity: [0.6, 1, 0.6],
+                  y: [0, -3, 0]
+                }}
+                transition={{
+                  repeat: Number.POSITIVE_INFINITY,
+                  duration: 2.5,
+                  ease: "easeInOut"
+                }}
+              >
+                SCROLL UNTUK MELIHAT
+              </motion.span>
+            </motion.div>
+          )}
+
+          {/* Slide Indicators */}
+          <div className="flex gap-2 justify-center">
+            {slides.map((slide, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === currentSlide
+                    ? "bg-blue-400 w-6 sm:w-8 md:w-12"
+                    : "bg-white/30 w-3 sm:w-4 md:w-6"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
       </section>
     </ErrorBoundary>
   )

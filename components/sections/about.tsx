@@ -9,14 +9,12 @@ const timelineItems = [
   {
     year: "2010",
     title: "Awal Mula",
-    description:
-      "Cipta Mandiri Perkasa didirikan dengan visi menjadi perusahaan terdepan dalam pembuatan kubah masjid dan ornamen islami.",
+    description: "Cipta Mandiri Perkasa didirikan dengan visi menjadi perusahaan terdepan dalam pembuatan kubah masjid dan ornamen islami.",
   },
   {
     year: "2012",
     title: "Proyek Pertama",
-    description:
-      "Menyelesaikan proyek kubah masjid pertama di Jawa Tengah yang mendapatkan apresiasi dari masyarakat sekitar.",
+    description: "Menyelesaikan proyek kubah masjid pertama di Jawa Tengah yang mendapatkan apresiasi dari masyarakat sekitar.",
   },
   {
     year: "2015",
@@ -41,20 +39,17 @@ const timelineItems = [
   {
     year: "2022",
     title: "Ekspansi Regional",
-    description:
-      "Mulai menerima dan mengerjakan proyek-proyek di negara tetangga seperti Malaysia dan Brunei Darussalam.",
+    description: "Mulai menerima dan mengerjakan proyek-proyek di negara tetangga seperti Malaysia dan Brunei Darussalam.",
   },
   {
     year: "2023",
     title: "Pencapaian Baru",
-    description:
-      "Telah menyelesaikan lebih dari 500 proyek di seluruh Indonesia dan mulai menerima proyek internasional.",
+    description: "Telah menyelesaikan lebih dari 500 proyek di seluruh Indonesia dan mulai menerima proyek internasional.",
   },
   {
     year: "2024",
     title: "Inovasi Berkelanjutan",
-    description:
-      "Mengembangkan material kubah yang lebih tahan lama dan ramah lingkungan sebagai komitmen terhadap keberlanjutan.",
+    description: "Mengembangkan material kubah yang lebih tahan lama dan ramah lingkungan sebagai komitmen terhadap keberlanjutan.",
   },
 ]
 
@@ -62,60 +57,88 @@ export default function About() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: false, amount: 0.2 })
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
+  // Animation variants
+  const animationVariants = {
+    container: {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.2,
+        },
       },
     },
+    item: {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.6, ease: "easeOut" },
+      },
+    },
+    fadeInUp: {
+      hidden: { opacity: 0, y: 20 },
+      visible: { opacity: 1, y: 0 },
+    },
+    fadeInLeft: {
+      hidden: { opacity: 0, x: -30 },
+      visible: { opacity: 1, x: 0 },
+    },
+    fadeInRight: {
+      hidden: { opacity: 0, x: 30 },
+      visible: { opacity: 1, x: 0 },
+    },
+    scaleIn: {
+      hidden: { opacity: 0, scale: 0.9 },
+      visible: { opacity: 1, scale: 1 },
+    }
   }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
+  // Transition settings
+  const transition = {
+    duration: 0.8,
+    ease: "easeOut"
   }
 
   return (
     <section id="about" className="section-padding bg-white" ref={ref}>
       <div className="container">
+        {/* Header Section */}
         <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6 }}
+          className="text-center mb-8 md:mb-12"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={animationVariants.fadeInUp}
+          transition={transition}
         >
           <h2 className="heading-primary">Tentang Kami</h2>
-          <p className="max-w-3xl mx-auto text-lg text-gray-600">
+          <p className="max-w-3xl mx-auto text-base md:text-lg text-gray-600 px-4 md:px-0">
             Cipta Mandiri Perkasa adalah perusahaan spesialis dalam pembuatan kubah masjid dan ornamen islami dengan
             pengalaman lebih dari 10 tahun.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+        {/* Vision & Mission Section */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16 px-4 md:px-0">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={animationVariants.fadeInLeft}
+            transition={{ ...transition, delay: 0.2 }}
           >
             <h3 className="heading-secondary">Visi & Misi</h3>
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold mb-2 text-primary">Visi</h4>
-              <p className="text-gray-600">
+            <div className="mb-4 md:mb-6">
+              <h4 className="text-lg md:text-xl font-semibold mb-2 text-primary">Visi</h4>
+              <p className="text-gray-600 text-sm md:text-base">
                 Menjadi perusahaan terdepan dalam pembuatan kubah masjid dan ornamen islami yang berkualitas tinggi,
                 inovatif, dan terpercaya di Indonesia.
               </p>
             </div>
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold mb-2 text-primary">Misi</h4>
+            <div className="mb-4 md:mb-6">
+              <h4 className="text-lg md:text-xl font-semibold mb-2 text-primary">Misi</h4>
               <motion.ul
-                className="space-y-3"
-                variants={containerVariants}
+                className="space-y-2 md:space-y-3"
+                variants={animationVariants.container}
                 initial="hidden"
                 animate={isInView ? "visible" : "hidden"}
               >
@@ -125,19 +148,25 @@ export default function About() {
                   "Berinovasi dalam desain dan teknologi produksi",
                   "Berkontribusi dalam pengembangan arsitektur islami di Indonesia",
                 ].map((item, index) => (
-                  <motion.li key={index} className="flex items-start" variants={itemVariants}>
-                    <CheckCircle className="h-5 w-5 text-secondary mr-2 mt-1 flex-shrink-0" />
-                    <span className="text-gray-600">{item}</span>
+                  <motion.li 
+                    key={index} 
+                    className="flex items-start" 
+                    variants={animationVariants.item}
+                  >
+                    <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-secondary mr-2 mt-0.5 md:mt-1 flex-shrink-0" />
+                    <span className="text-gray-600 text-sm md:text-base">{item}</span>
                   </motion.li>
                 ))}
               </motion.ul>
             </div>
           </motion.div>
+          
           <motion.div
-            className="relative h-[400px] rounded-lg overflow-hidden shadow-lg"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-md md:shadow-lg"
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={animationVariants.scaleIn}
+            transition={{ ...transition, delay: 0.4 }}
           >
             <Image
               src="/about.webp?height=800&width=600"
@@ -145,68 +174,91 @@ export default function About() {
               fill
               className="object-cover"
               loading="lazy"
+              priority={false}
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
           </motion.div>
         </div>
 
-        <div>
+        {/* Timeline Section - Fully Responsive */}
+        <div className="px-4 md:px-0">
           <motion.h3
-            className="heading-secondary text-center mb-8"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            className="heading-secondary text-center mb-8 md:mb-12 lg:mb-16"
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={animationVariants.fadeInUp}
+            transition={{ ...transition, delay: 0.6 }}
           >
             Perjalanan Kami
           </motion.h3>
-          <div className="relative">
-            {/* Timeline Line - Continuous vertical line connecting all items */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary via-secondary to-primary"></div>
-
-            {/* Timeline Items */}
-            <div className="space-y-12">
-            {timelineItems.map((item, index) => (
-              <motion.div
-                key={index}
-                className={`relative flex items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-              >
-                <div className={`flex-1 ${index % 2 === 0 ? "md:pr-12" : "md:pl-12"} ${index % 2 !== 0 ? "md:pr-12" : "md:pl-12"} pl-12`}>
-                  <div
-                    className={`bg-white p-6 rounded-lg shadow-md border-l-4 ${
-                      index % 2 === 0 ? "md:text-right border-primary" : "border-secondary"
-                    } hover:shadow-lg transition-shadow duration-300 relative`}
-                  >
-                    {/* Connecting line from card to timeline */}
-                    <div
-                      className={`absolute top-1/2 -translate-y-1/2 h-0.5 bg-gradient-to-r ${
-                        index % 2 === 0
-                          ? "right-0 translate-x-full from-primary to-transparent md:w-12"
-                          : "left-0 -translate-x-full from-transparent to-secondary md:w-12"
-                      } hidden md:block`}
-                    ></div>
-
-                    <span className="text-secondary font-bold">{item.year}</span>
-                    <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
-                    <p className="text-gray-600">{item.description}</p>
-                  </div>
-                </div>
-
-                {/* Timeline Dot with connecting lines */}
+          
+          <div className="relative max-w-5xl mx-auto">
+            {/* Mobile Timeline (Stacked) */}
+            <div className="md:hidden space-y-6">
+              {timelineItems.map((item, index) => (
                 <motion.div
-                  className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2 top-1/2 w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center shadow-md z-10"
-                  whileHover={{ scale: 1.2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  key={index}
+                  className="relative"
+                  initial="hidden"
+                  animate={isInView ? "visible" : "hidden"}
+                  variants={animationVariants.fadeInUp}
+                  transition={{ ...transition, delay: 0.1 + index * 0.1 }}
                 >
-                  <div className="w-4 h-4 rounded-full bg-white"></div>
+                  <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-primary relative">
+                    <div className="absolute -left-[15px] top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full bg-primary" />
+                    <div className="text-secondary font-bold text-xs mb-1">{item.year}</div>
+                    <h4 className="text-base font-semibold mb-1">{item.title}</h4>
+                    <p className="text-gray-600 text-sm">{item.description}</p>
+                  </div>
                 </motion.div>
+              ))}
+            </div>
 
-                <div className="flex-1 hidden md:block"></div>
-              </motion.div>
-            ))}
-          </div>
+            {/* Desktop Timeline (Alternating) */}
+            <div className="hidden md:block">
+              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-200" />
+              <div className="space-y-12 pt-8">
+                {timelineItems.map((item, index) => {
+                  const isEven = index % 2 === 0;
+                  return (
+                    <motion.div
+                      key={index}
+                      className={`relative flex ${isEven ? "justify-start" : "justify-end"}`}
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      variants={animationVariants.fadeInUp}
+                      transition={{ ...transition, delay: 0.1 + index * 0.1 }}
+                    >
+                      <div className={`w-[45%] ${isEven ? "pr-8" : "pl-8"}`}>
+                        <motion.div 
+                          className={`bg-white p-5 md:p-6 rounded-lg md:rounded-xl shadow-sm md:shadow-md border-l-4 ${
+                            isEven ? "border-primary" : "border-secondary"
+                          } hover:shadow-md transition-all duration-300 relative`}
+                          whileHover={{ y: -5 }}
+                        >
+                          <div className={`absolute -top-6 ${isEven ? "right-0" : "left-0"} text-secondary font-bold text-xs md:text-sm`}>
+                            {item.year}
+                          </div>
+                          <div className={`absolute top-1/2 h-0.5 w-6 ${
+                            isEven 
+                              ? "right-0 translate-x-full bg-primary" 
+                              : "left-0 -translate-x-full bg-secondary"
+                          }`} />
+                          <div className={`absolute top-1/2 w-3 h-3 rounded-full ${
+                            isEven 
+                              ? "right-0 translate-x-[calc(100%+18px)] bg-primary" 
+                              : "left-0 -translate-x-[calc(100%+18px)] bg-secondary"
+                          }`} />
+                          <h4 className="text-base md:text-lg font-semibold mb-1 md:mb-2">{item.title}</h4>
+                          <p className="text-gray-600 text-sm md:text-base">{item.description}</p>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
