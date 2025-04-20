@@ -216,7 +216,7 @@ export default async function ServicePage({ params }: Props) {
                 kompetitif.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer">
+                <Link href="https://wa.me/6281386225702" target="_blank" rel="noopener noreferrer">
                   <Button className="bg-green-600 hover:bg-green-700 rounded-[12px] px-6 py-3 text-white">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

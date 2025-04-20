@@ -59,7 +59,7 @@ export default function StructuredData({
           name: organizationName,
           logo: {
             "@type": "ImageObject",
-            url: "https://kubahcmp.id/logo.png",
+            url: "https://kubahcmp.id/images/logo.png",
           },
         },
       }
@@ -99,10 +99,10 @@ export default function StructuredData({
         "@type": "Organization",
         name: organizationName || title,
         url: url || "https://kubahcmp.id",
-        logo: "https://kubahcmp.id/logo.png",
+        logo: "https://kubahcmp.id/images/logo.png",
         contactPoint: {
           "@type": "ContactPoint",
-          telephone: "+6281234567890",
+          telephone: "+6281386225702",
           contactType: "customer service",
         },
         sameAs: [
@@ -117,9 +117,9 @@ export default function StructuredData({
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         name: organizationName || title,
-        image: imageUrl || "https://kubahcmp.id/logo.png",
+        image: imageUrl || "https://kubahcmp.id/images/logo.png",
         url: url || "https://kubahcmp.id",
-        telephone: "+6281234567890",
+        telephone: "+6281386225702",
         address: {
           "@type": "PostalAddress",
           streetAddress: "Kp.pisang, batu, Jl. Raya Tambelang No.RT.02",

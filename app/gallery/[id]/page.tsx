@@ -162,7 +162,7 @@ export default async function GalleryItemPage({ params }: Props) {
                     yang kompetitif.
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    <Link href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer">
+                    <Link href="https://wa.me/6281386225702" target="_blank" rel="noopener noreferrer">
                       <Button className="bg-green-600 hover:bg-green-700 rounded-xl">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

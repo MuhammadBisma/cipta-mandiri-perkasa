@@ -356,7 +356,7 @@ export default function RootLayout({
               logo: "https://kubahcmp.id/images/logo.png?v=2",
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+6281510655126",
+                telephone: "+6281386225702",
                 contactType: "customer service",
               },
             }),

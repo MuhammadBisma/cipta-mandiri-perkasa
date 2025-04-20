@@ -19,7 +19,7 @@ export const metadata: Metadata = {
       "Cipta Mandiri Perkasa adalah spesialis kubah masjid, masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "https://kubahcmp.id/images/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Cipta Mandiri Perkasa",

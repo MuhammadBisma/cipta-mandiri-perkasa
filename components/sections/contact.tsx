@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { SuccessModal } from "@/components/sections/success-modal"
-import { Phone, Mail, MapPin, Send, CheckCircle, Clock, ExternalLink, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react'
+import { Phone, Mail, MapPin, Send, Clock, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react'
 import { motion, useInView } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 
@@ -16,8 +16,8 @@ import { useToast } from "@/hooks/use-toast"
 const CONTACT_INFO = {
   phone1: "+62 813-8622-5702",
   phone2: "+62 813-8622-5702",
-  email1: "info@ciptamandiriperkasa.com",
-  email2: "support@ciptamandiriperkasa.com",
+  email1: "kubah.cmp@gmail.com",
+  email2: "kubah.cmp@gmail.com",
   address: "Kp.pisang, batu, Jl. Raya Tambelang No.RT.02, Kertamukti, Kec. Cibitung, Kabupaten Bekasi, Jawa Barat 17520"
 }
 
