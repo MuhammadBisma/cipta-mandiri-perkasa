@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, Upload, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import TipTapEditor from "@/components/blog/tiptap-editor"
+import EditorGuidelines from "@/components/blog/editor-guidelines"
 
 const categories = ["Sejarah", "Tips", "Desain", "Perawatan", "Tren", "Arsitektur", "Berita", "Lainnya"]
 
@@ -89,6 +91,10 @@ export default function EditBlogPost() {
     reader.readAsDataURL(file)
   }
 
+  const handleContentChange = (html: string) => {
+    setContent(html)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -152,14 +158,14 @@ export default function EditBlogPost() {
           <p className="text-gray-500">Edit artikel blog Cipta Mandiri Perkasa</p>
         </div>
         <Link href="/admin/blog">
-          <Button 
-          variant="outline" 
-          className="rounded-xl border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+          <Button variant="outline" className="rounded-xl border-gray-300 hover:bg-gray-50 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali
           </Button>
         </Link>
       </div>
+
+      <EditorGuidelines />
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -194,14 +200,10 @@ export default function EditBlogPost() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="content">Konten</Label>
-                  <Textarea
-                    id="content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Masukkan konten artikel"
-                    className="block w-full p-2 border border-gray-300 rounded-xl"
-                    rows={15}
-                    required
+                  <TipTapEditor
+                    content={content}
+                    onChange={handleContentChange}
+                    placeholder="Mulai menulis artikel Anda..."
                   />
                 </div>
               </CardContent>
@@ -226,18 +228,14 @@ export default function EditBlogPost() {
                   <Select value={category} onValueChange={setCategory} required>
                     <SelectTrigger className="bg-white rounded-xl hover:bg-white focus:bg-white data-[state=open]:bg-white">
                       <SelectValue placeholder="Pilih kategori" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white mt-1">
-                        {categories.map((cat) => (
-                        <SelectItem 
-                        key={cat} 
-                      value={cat}
-                    className="hover:bg-gray-100 focus:bg-gray-100"
-                    >
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </SelectItem>
-                  ))}
-                  </SelectContent>
+                    </SelectTrigger>
+                    <SelectContent className="bg-white mt-1">
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat} className="hover:bg-gray-100 focus:bg-gray-100">
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
               </CardContent>

@@ -11,9 +11,10 @@ import BlogSidebar from "@/components/blog/blog-sidebar"
 import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import Breadcrumbs from "@/components/seo/breadcrumbs"
-import StructuredData from "@/components/seo/structured-data"
 import CanonicalUrl from "@/components/seo/canonical-url"
 import { extractKeywords, generateMetaDescription } from "@/lib/seo-utils"
+import BlogContentRenderer from "@/components/blog/blog-content-renderer"
+import BlogSeoSchema from "@/components/blog/blog-seo-schema"
 
 type Props = {
   params: { slug: string }
@@ -111,14 +112,16 @@ export default async function BlogPostPage({ params }: Props) {
     <>
       <Navbar />
       <CanonicalUrl path={`/blog/${post.slug}`} />
-      <StructuredData
-        type="Article"
+      <BlogSeoSchema
         title={post.title}
         description={post.excerpt}
+        content={post.content}
         imageUrl={post.imageUrl}
+        authorName={post.author?.name || "Admin"}
         datePublished={post.createdAt.toISOString()}
         dateModified={post.updatedAt.toISOString()}
-        authorName={post.author?.name}
+        url={`https://kubahcmp.id/blog/${post.slug}`}
+        category={post.category}
       />
 
       <main className="pt-24">
@@ -177,7 +180,7 @@ export default async function BlogPostPage({ params }: Props) {
                     </div>
                   </div>
 
-                  <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+                  <BlogContentRenderer content={post.content} title={post.title} />
 
                   <div className="mt-8 pt-6 border-t">
                     <SocialShareButtons title={post.title} slug={post.slug} />

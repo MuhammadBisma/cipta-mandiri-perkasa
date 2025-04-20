@@ -325,7 +325,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "google-site-verification-code",
+    google: "google88e19c93b4b882d5.html",
     yandex: "yandex-verification-code",
   },
 }
@@ -345,6 +345,7 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="facebook-domain-verification" content="your-facebook-verification-code" />
+        <meta name="google-site-verification" content="google88e19c93b4b882d5.html" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -7,19 +7,19 @@ import { motion, useInView } from "framer-motion"
 
 const timelineItems = [
   {
-    year: "2010",
-    title: "Awal Mula",
-    description: "Cipta Mandiri Perkasa didirikan dengan visi menjadi perusahaan terdepan dalam pembuatan kubah masjid dan ornamen islami.",
+    year: "2009",
+    title: "Awal Perjalanan Cipta Mandiri Perkasa",
+    description: "Cipta Mandiri Perkasa (CMP) didirikan pada tahun 2009 dengan visi untuk menjadi perusahaan terdepan di bidang kontraktor pembuatan kubah GRC (Glassfiber Reinforced Cement). Dengan latar belakang profesionalisme dan pengalaman yang mendalam, CMP mulai menawarkan solusi konstruksi kubah berkualitas tinggi yang mengutamakan estetika dan ketahanan.",
   },
   {
-    year: "2012",
-    title: "Proyek Pertama",
-    description: "Menyelesaikan proyek kubah masjid pertama di Jawa Tengah yang mendapatkan apresiasi dari masyarakat sekitar.",
+    year: "2011",
+    title: "Perkembangan dan Pengembangan Produk",
+    description: "Setelah dua tahun beroperasi, CMP mulai mengembangkan berbagai produk dan layanan yang meliputi pembuatan kubah GRC untuk masjid, gereja, dan bangunan ikonik lainnya. Tim CMP fokus pada penggunaan material terbaik yang dapat memberikan hasil maksimal dalam hal estetika dan daya tahan, memperkenalkan inovasi dalam desain kubah yang menyesuaikan dengan kebutuhan dan selera pelanggan.",
   },
   {
     year: "2015",
-    title: "Ekspansi Bisnis",
-    description: "Memperluas layanan dengan menambahkan pembuatan mimbar, menara, dan kerawangan.",
+    title: "Ekspansi Layanan dan Proyek Skala Besar",
+    description: "Memasuki tahun 2015, CMP semakin dikenal di pasar lokal maupun nasional. Perusahaan mulai mengerjakan proyek-proyek besar, seperti renovasi kubah masjid dan pemasangan kubah GRC untuk bangunan komersial. Keberhasilan dalam berbagai proyek ini semakin memperkuat reputasi CMP sebagai kontraktor terpercaya di bidang kubah GRC.",
   },
   {
     year: "2016",
@@ -28,28 +28,18 @@ const timelineItems = [
   },
   {
     year: "2018",
-    title: "Inovasi Teknologi",
-    description: "Mengadopsi teknologi modern dalam proses produksi untuk meningkatkan kualitas dan efisiensi.",
-  },
-  {
-    year: "2020",
-    title: "Pencapaian 300 Proyek",
-    description: "Berhasil menyelesaikan lebih dari 300 proyek kubah masjid di seluruh Indonesia.",
+    title: "Penguatan Tim dan Peningkatan Kualitas",
+    description: "CMP terus berinovasi dengan meningkatkan kualitas dan keahlian tim. Dengan adanya pelatihan dan pengembangan keterampilan, CMP mampu memenuhi permintaan pasar yang semakin berkembang. Selain itu, perusahaan mulai memperkenalkan berbagai desain kubah yang lebih kompleks dan modern, memberi pelanggan lebih banyak pilihan dalam hal bentuk dan warna.",
   },
   {
     year: "2022",
-    title: "Ekspansi Regional",
-    description: "Mulai menerima dan mengerjakan proyek-proyek di negara tetangga seperti Malaysia dan Brunei Darussalam.",
+    title: "Penghargaan dan Pengakuan Industri",
+    description: "Setelah lebih dari satu dekade berdedikasi di industri, CMP mendapatkan penghargaan dan pengakuan sebagai salah satu perusahaan terbaik dalam pembuatan kubah GRC. Pencapaian ini menjadi bukti dari komitmen CMP dalam memberikan layanan terbaik, dengan kualitas dan ketepatan waktu yang selalu menjadi prioritas utama.",
   },
   {
-    year: "2023",
-    title: "Pencapaian Baru",
-    description: "Telah menyelesaikan lebih dari 500 proyek di seluruh Indonesia dan mulai menerima proyek internasional.",
-  },
-  {
-    year: "2024",
-    title: "Inovasi Berkelanjutan",
-    description: "Mengembangkan material kubah yang lebih tahan lama dan ramah lingkungan sebagai komitmen terhadap keberlanjutan.",
+    year: "2025",
+    title: "CMP Hari Ini",
+    description: "Saat ini, Cipta Mandiri Perkasa (CMP) telah berkembang menjadi salah satu pemimpin dalam industri pembuatan kubah GRC di Indonesia. Dengan lebih dari 15 tahun pengalaman, perusahaan ini telah menyelesaikan berbagai proyek bergengsi dan terus berkomitmen untuk menghadirkan solusi inovatif dalam pembuatan kubah GRC yang indah, tahan lama, dan ramah anggaran. CMP tidak hanya berfokus pada desain dan pemasangan, tetapi juga terus mengedepankan kepuasan pelanggan melalui layanan purna jual yang memadai.",
   },
 ]
 
@@ -114,7 +104,7 @@ export default function About() {
           <h2 className="heading-primary">Tentang Kami</h2>
           <p className="max-w-3xl mx-auto text-base md:text-lg text-gray-600 px-4 md:px-0">
             Cipta Mandiri Perkasa adalah perusahaan spesialis dalam pembuatan kubah masjid dan ornamen islami dengan
-            pengalaman lebih dari 10 tahun.
+            pengalaman lebih dari 15 tahun.
           </p>
         </motion.div>
 

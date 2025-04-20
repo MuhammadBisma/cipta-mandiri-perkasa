@@ -24,6 +24,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { CheckCircle2 } from "lucide-react"
+import TipTapEditor from "@/components/blog/tiptap-editor"
+import EditorGuidelines from "@/components/blog/editor-guidelines"
 
 const categories = ["Sejarah", "Tips", "Desain", "Perawatan", "Tren", "Arsitektur", "Berita", "Lainnya"]
 
@@ -62,6 +64,10 @@ export default function NewBlogPost() {
       setImagePreview(reader.result as string)
     }
     reader.readAsDataURL(file)
+  }
+
+  const handleContentChange = (html: string) => {
+    setContent(html)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -145,6 +151,8 @@ export default function NewBlogPost() {
         </Link>
       </div>
 
+      <EditorGuidelines />
+
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
@@ -178,14 +186,10 @@ export default function NewBlogPost() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="content">Konten</Label>
-                  <Textarea
-                    id="content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Masukkan konten artikel"
-                    className="block w-full p-2 border border-gray-300 rounded-xl"
-                    rows={15}
-                    required
+                  <TipTapEditor
+                    content={content}
+                    onChange={handleContentChange}
+                    placeholder="Mulai menulis artikel Anda..."
                   />
                 </div>
               </CardContent>
