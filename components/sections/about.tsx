@@ -9,17 +9,17 @@ const timelineItems = [
   {
     year: "2009",
     title: "Awal Perjalanan Cipta Mandiri Perkasa",
-    description: "Cipta Mandiri Perkasa (CMP) didirikan pada tahun 2009 dengan visi untuk menjadi perusahaan terdepan di bidang kontraktor pembuatan kubah GRC (Glassfiber Reinforced Cement). Dengan latar belakang profesionalisme dan pengalaman yang mendalam, CMP mulai menawarkan solusi konstruksi kubah berkualitas tinggi yang mengutamakan estetika dan ketahanan.",
+    description: "Didirikan pada tahun 2009, Cipta Mandiri Perkasa (CMP) berkomitmen menjadi perusahaan terdepan dalam bidang konstruksi kubah GRC (Glassfiber Reinforced Cement). Dengan landasan profesionalisme dan pengalaman yang mendalam, CMP menghadirkan solusi konstruksi kubah yang mengutamakan nilai estetika serta ketahanan jangka panjang.",
   },
   {
     year: "2011",
     title: "Perkembangan dan Pengembangan Produk",
-    description: "Setelah dua tahun beroperasi, CMP mulai mengembangkan berbagai produk dan layanan yang meliputi pembuatan kubah GRC untuk masjid, gereja, dan bangunan ikonik lainnya. Tim CMP fokus pada penggunaan material terbaik yang dapat memberikan hasil maksimal dalam hal estetika dan daya tahan, memperkenalkan inovasi dalam desain kubah yang menyesuaikan dengan kebutuhan dan selera pelanggan.",
+    description: "Dua tahun setelah berdiri, CMP mulai mengembangkan produk dan layanan pembuatan kubah GRC untuk masjid, gereja, dan bangunan ikonik lainnya. Dengan fokus pada material berkualitas dan desain inovatif, CMP menghadirkan solusi yang estetis, tahan lama, serta sesuai kebutuhan pelanggan.",
   },
   {
     year: "2015",
     title: "Ekspansi Layanan dan Proyek Skala Besar",
-    description: "Memasuki tahun 2015, CMP semakin dikenal di pasar lokal maupun nasional. Perusahaan mulai mengerjakan proyek-proyek besar, seperti renovasi kubah masjid dan pemasangan kubah GRC untuk bangunan komersial. Keberhasilan dalam berbagai proyek ini semakin memperkuat reputasi CMP sebagai kontraktor terpercaya di bidang kubah GRC.",
+    description: "Pada 2015, CMP mulai dikenal luas di pasar lokal dan nasional melalui pengerjaan proyek-proyek besar, seperti renovasi kubah masjid dan pemasangan kubah GRC untuk bangunan komersial. Keberhasilan ini memperkuat reputasi CMP sebagai kontraktor terpercaya di bidang kubah GRC.",
   },
   {
     year: "2016",
@@ -29,17 +29,17 @@ const timelineItems = [
   {
     year: "2018",
     title: "Penguatan Tim dan Peningkatan Kualitas",
-    description: "CMP terus berinovasi dengan meningkatkan kualitas dan keahlian tim. Dengan adanya pelatihan dan pengembangan keterampilan, CMP mampu memenuhi permintaan pasar yang semakin berkembang. Selain itu, perusahaan mulai memperkenalkan berbagai desain kubah yang lebih kompleks dan modern, memberi pelanggan lebih banyak pilihan dalam hal bentuk dan warna.",
+    description: "CMP terus berinovasi melalui peningkatan kualitas dan keahlian tim, didukung oleh pelatihan berkelanjutan. Perusahaan juga memperkenalkan desain kubah yang lebih kompleks dan modern, memberikan lebih banyak pilihan bentuk dan warna bagi pelanggan.",
   },
   {
     year: "2022",
     title: "Penghargaan dan Pengakuan Industri",
-    description: "Setelah lebih dari satu dekade berdedikasi di industri, CMP mendapatkan penghargaan dan pengakuan sebagai salah satu perusahaan terbaik dalam pembuatan kubah GRC. Pencapaian ini menjadi bukti dari komitmen CMP dalam memberikan layanan terbaik, dengan kualitas dan ketepatan waktu yang selalu menjadi prioritas utama.",
+    description: "Lebih dari satu dekade berkarya, CMP meraih berbagai penghargaan dan pengakuan sebagai salah satu perusahaan terbaik di bidang kubah GRC—sebuah bukti komitmen terhadap kualitas, layanan prima, dan ketepatan waktu.",
   },
   {
     year: "2025",
     title: "CMP Hari Ini",
-    description: "Saat ini, Cipta Mandiri Perkasa (CMP) telah berkembang menjadi salah satu pemimpin dalam industri pembuatan kubah GRC di Indonesia. Dengan lebih dari 15 tahun pengalaman, perusahaan ini telah menyelesaikan berbagai proyek bergengsi dan terus berkomitmen untuk menghadirkan solusi inovatif dalam pembuatan kubah GRC yang indah, tahan lama, dan ramah anggaran. CMP tidak hanya berfokus pada desain dan pemasangan, tetapi juga terus mengedepankan kepuasan pelanggan melalui layanan purna jual yang memadai.",
+    description: "Saat ini, CMP telah tumbuh menjadi salah satu pemimpin industri kubah GRC di Indonesia. Dengan pengalaman lebih dari 15 tahun, CMP menyelesaikan berbagai proyek bergengsi dan terus menghadirkan solusi kubah yang inovatif, estetis, tahan lama, dan terjangkau—dengan layanan purna jual yang berorientasi pada kepuasan pelanggan.",
   },
 ]
 
