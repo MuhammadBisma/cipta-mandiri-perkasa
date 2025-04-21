@@ -11,5 +11,15 @@ module.exports = {
         NODE_ENV: "production",
       },
     },
+    {
+      name: "backup-checker",
+      script: "scripts/run-scheduled-backup.js",
+      cron_restart: "*/5 * * * *",
+      autorestart: false,
+      watch: false,
+      env: {
+        NODE_ENV: "production",
+      },
+    }
   ],
-};
+}

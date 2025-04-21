@@ -1,6 +1,5 @@
 const { runScheduledBackups } = require('../lib/backup');
 
-
 async function main() {
   try {
     console.log('Running scheduled backups...');

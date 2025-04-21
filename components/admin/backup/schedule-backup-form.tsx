@@ -137,19 +137,17 @@ export default function ScheduleBackupForm() {
               <div className="space-y-2">
                 <Label htmlFor="backup-frequency">Frekuensi Backup</Label>
                 <Select value={backupFrequency} onValueChange={setBackupFrequency}>
-  <SelectTrigger id="backup-frequency">
-    <SelectValue placeholder="Pilih frekuensi" />
-  </SelectTrigger>
-  <SelectContent className="bg-white border border-gray-200 shadow-lg">
-    <SelectItem value="HOURLY" className="data-[state=checked]:bg-gray-100">Setiap Jam</SelectItem>
-    <SelectItem value="DAILY" className="data-[state=checked]:bg-gray-100">Harian</SelectItem>
-    <SelectItem value="WEEKLY" className="data-[state=checked]:bg-gray-100">Mingguan</SelectItem>
-    <SelectItem value="MONTHLY" className="data-[state=checked]:bg-gray-100">Bulanan</SelectItem>
-  </SelectContent>
-</Select>
-
+                <SelectTrigger id="backup-frequency">
+                  <SelectValue placeholder="Pilih frekuensi" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                  <SelectItem value="HOURLY" className="data-[state=checked]:bg-gray-100">Setiap Jam</SelectItem>
+                  <SelectItem value="DAILY" className="data-[state=checked]:bg-gray-100">Harian</SelectItem>
+                  <SelectItem value="WEEKLY" className="data-[state=checked]:bg-gray-100">Mingguan</SelectItem>
+                  <SelectItem value="MONTHLY" className="data-[state=checked]:bg-gray-100">Bulanan</SelectItem>
+                </SelectContent>
+              </Select>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="backup-time">Waktu Backup</Label>
                 <Input
