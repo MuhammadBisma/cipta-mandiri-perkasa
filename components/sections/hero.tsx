@@ -36,7 +36,7 @@ const slides = [
   },
 ]
 
-const whatsappNumber = "6285218729008"
+const whatsappNumber = "6281386225702"
 const whatsappMessage = "Halo, saya ingin berkonsultasi tentang..."
 
 export default function Hero() {
