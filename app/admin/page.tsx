@@ -25,7 +25,7 @@ import { motion } from "framer-motion"
 import DashboardCard from "@/components/admin/dashboard-card"
 import ActivityCard from "@/components/admin/activity-card"
 import StatsCard from "@/components/admin/stats-card"
-import { AreaChart, DonutChart } from "@tremor/react"
+import { AreaChart } from "@tremor/react"
 import { Button } from "@/components/ui/button"
 import { format, subDays, formatDistanceToNow } from "date-fns"
 import { id } from "date-fns/locale"
@@ -40,6 +40,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import Image from "next/image"
+import { PieChart, Pie, Cell, Tooltip, LabelList, ResponsiveContainer } from "recharts"
 
 interface DashboardData {
   blogCount: number
@@ -110,6 +111,55 @@ const serviceColors = [
   "#ef4444", // red
 ]
 
+// Define valid services
+const validServices = ["Kubah Masjid", "Mimbar", "Menara", "Kerawangan", "Kaligrafi", "Ornamen", "Masjid"]
+
+// Custom label renderer for the pie chart
+const renderCustomizedLabel = (props: any) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent, index, name, value } = props
+  const RADIAN = Math.PI / 180
+  const radius = innerRadius + (outerRadius - innerRadius) * 1.1
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={serviceColors[index % serviceColors.length]}
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+      className="text-xs font-medium"
+    >
+      {name} ({value})
+    </text>
+  )
+}
+
+// Custom tooltip for the pie chart
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
+        <h3 className="font-semibold mb-2">Layanan Terpopuler</h3>
+        <p className="text-sm text-gray-500 mb-3">Detail kunjungan</p>
+        <div className="space-y-2">
+          {payload.map((entry: any, index: number) => (
+            <div key={`item-${index}`} className="flex justify-between items-center">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: entry.color }}></div>
+                <span className="text-sm">{entry.name}</span>
+              </div>
+              <span className="text-sm font-medium">{entry.value} kunjungan</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+  return null
+}
+
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
@@ -174,13 +224,45 @@ export default function AdminDashboard() {
       const data = await res.json()
 
       if (data.success && Array.isArray(data.services)) {
-        // Assign colors to each service
-        const servicesWithColors = data.services.map((service: any, index: number) => ({
-          ...service,
-          color: serviceColors[index % serviceColors.length],
-        }))
-        setServiceData(servicesWithColors)
-        return servicesWithColors
+        // Filter out any 404 pages or invalid services
+        let services = data.services.filter((service: any) => {
+          const serviceName = service.name.toLowerCase()
+          return (
+            !serviceName.includes("404") && !serviceName.includes("not found") && !serviceName.includes("could not")
+          )
+        })
+
+        // If we don't have enough services, add default ones
+        if (services.length < 7) {
+          const defaultServices = [
+            { name: "Kubah Masjid", value: 45, color: serviceColors[0], path: "/services/kubah" },
+            { name: "Mimbar", value: 38, color: serviceColors[1], path: "/services/mimbar" },
+            { name: "Menara", value: 32, color: serviceColors[2], path: "/services/menara" },
+            { name: "Kerawangan", value: 28, color: serviceColors[3], path: "/services/kerawangan" },
+            { name: "Kaligrafi", value: 25, color: serviceColors[4], path: "/services/kaligrafi" },
+            { name: "Ornamen", value: 20, color: serviceColors[5], path: "/services/ornamen" },
+            { name: "Masjid", value: 15, color: serviceColors[6], path: "/services/masjid" },
+          ]
+
+          // Get names of services we already have
+          const existingNames = services.map((s: any) => s.name.toLowerCase())
+
+          // Add default services that aren't already in our list
+          for (const defaultService of defaultServices) {
+            if (!existingNames.includes(defaultService.name.toLowerCase()) && services.length < 7) {
+              services.push({
+                ...defaultService,
+                color: serviceColors[services.length % serviceColors.length],
+              })
+            }
+          }
+        }
+
+        // Limit to 7 services
+        services = services.slice(0, 7)
+
+        setServiceData(services)
+        return services
       } else {
         throw new Error("Invalid response format")
       }
@@ -745,106 +827,93 @@ export default function AdminDashboard() {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden">
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Statistik Pengunjung</h3>
-                <div className="text-sm text-green-500 font-medium flex items-center gap-1 bg-green-50 px-3 py-1 rounded-full">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  {realTimeVisitors.length} pengunjung online
-                </div>
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Statistik Pengunjung</h3>
+              <div className="text-sm text-green-500 font-medium flex items-center gap-1 bg-green-50 px-3 py-1 rounded-full transition-all duration-300 ease-in-out hover:bg-white hover:text-green-500 hover:shadow-lg">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                {realTimeVisitors.length} pengunjung online
               </div>
-              {visitorChartData.length > 0 ? (
-                <AreaChart
-                  className="h-72"
-                  data={visitorChartData}
-                  index="date"
-                  categories={["Pengunjung", "Tampilan Halaman"]}
-                  colors={["indigo", "cyan"]}
-                  valueFormatter={(number) => `${Intl.NumberFormat("id").format(number)}`}
-                  showLegend
-                  showAnimation
-                />
+            </div>
+            {visitorChartData.length > 0 ? (
+              <AreaChart
+                className="h-72"
+                data={visitorChartData}
+                index="date"
+                categories={["Pengunjung", "Tampilan Halaman"]}
+                colors={["indigo", "cyan"]}
+                valueFormatter={(number) => `${Intl.NumberFormat("id").format(number)}`}
+                showLegend
+                showAnimation
+              />
+            ) : (
+              <div className="h-72 flex items-center justify-center bg-gray-50 rounded-lg">
+                <p className="text-gray-500">Tidak ada data pengunjung tersedia</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
+              {serviceData.length > 0 ? (
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={serviceData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={true}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        animationBegin={0}
+                        animationDuration={1000}
+                        isAnimationActive={true}
+                      >
+                        {serviceData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                        <LabelList dataKey="name" position="outside" content={renderCustomizedLabel} />
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="h-72 flex items-center justify-center bg-gray-50 rounded-lg">
-                  <p className="text-gray-500">Tidak ada data pengunjung tersedia</p>
+                <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg">
+                  <p className="text-gray-500">Tidak ada data layanan tersedia</p>
+                </div>
+              )}
+              {/* Service legend */}
+              {serviceData.length > 0 && (
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {serviceData.map((service, index) => (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start hover:bg-gray-100 rounded-lg"
+                      onClick={() => handleServiceClick(service)}
+                    >
+                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
+                      <span className="truncate">{service.name}</span>
+                    </Button>
+                  ))}
                 </div>
               )}
             </CardContent>
           </Card>
         </motion.div>
-
-        <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5, delay: 0.5 }}
->
-  <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
-    <CardContent className="pt-6">
-      <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
-      {serviceData.length > 0 ? (
-        <div className="h-72">
-          <DonutChart
-            className="h-72"
-            data={serviceData}
-            category="value"
-            index="name"
-            colors={serviceData.map((item) => item.color)}
-            valueFormatter={(number) => `${number} kunjungan`}
-            showAnimation
-            showTooltip
-            showLabel
-            customTooltip={(props) => {
-              return (
-                <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
-                  <h3 className="font-semibold mb-2">Layanan Terpopuler</h3>
-                  <p className="text-sm text-gray-500 mb-3">Detail kunjungan</p>
-                  
-                  <div className="space-y-2">
-                    {props.payload?.map((item: { color: any; name: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; value: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined }, index: React.Key | null | undefined) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <div 
-                            className="w-3 h-3 rounded-full mr-2" 
-                            style={{ backgroundColor: item.color }}
-                          ></div>
-                          <span className="text-sm">{item.name}</span>
-                        </div>
-                        <span className="text-sm font-medium">
-                          {item.value} kunjungan
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            }}
-          />
-        </div>
-      ) : (
-        <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg">
-          <p className="text-gray-500">Tidak ada data layanan tersedia</p>
-        </div>
-      )}
-      {/* Service legend */}
-      {serviceData.length > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {serviceData.map((service, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="sm"
-              className="justify-start hover:bg-gray-100 rounded-lg"
-              onClick={() => handleServiceClick(service)}
-            >
-              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
-              <span className="truncate">{service.name}</span>
-            </Button>
-          ))}
-        </div>
-      )}
-    </CardContent>
-  </Card>
-</motion.div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

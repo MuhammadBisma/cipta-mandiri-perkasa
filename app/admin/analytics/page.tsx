@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -22,10 +22,11 @@ import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { AreaChart, DonutChart } from "@tremor/react"
+import { AreaChart } from "@tremor/react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import ExportAnalyticsButton from "@/components/analytics/export-analytics-button"
+import { PieChart, Pie, Cell, Tooltip, LabelList, ResponsiveContainer } from "recharts"
 
 // Define types for analytics data
 interface AnalyticsData {
@@ -89,13 +90,13 @@ interface ChartDataPoint {
 
 interface TooltipProps {
   payload?: {
-    payload: any
-    value: number
-    name: string
-    color: string
-  }[]
-  label?: string
-  active?: boolean
+    payload: any;
+    value: number;
+    name: string;
+    color: string;
+  }[];
+  label?: string;
+  active?: boolean;
 }
 
 export default function AnalyticsPage() {
@@ -333,15 +334,15 @@ export default function AnalyticsPage() {
   }
 
   // Device type colors for the chart
-  const deviceColors = {
+  const deviceColors: Record<string, string> = {
     Desktop: "#0ea5e9", // Sky blue
     Mobile: "#8b5cf6", // Purple
     Tablet: "#10b981", // Emerald
     Other: "#f59e0b", // Amber
-  }
+  };
 
   // Browser colors for the chart
-  const browserColors = {
+  const browserColors: Record<string, string> = {
     Chrome: "#0ea5e9", // Sky blue
     Firefox: "#f97316", // Orange
     Safari: "#10b981", // Emerald
@@ -350,7 +351,7 @@ export default function AnalyticsPage() {
     "Samsung Internet": "#8b5cf6", // Purple
     IE: "#6b7280", // Gray
     Other: "#f59e0b", // Amber
-  }
+  };
 
   // Get color for device
   const getDeviceColor = (deviceType: string): string => {
@@ -587,42 +588,68 @@ export default function AnalyticsPage() {
                     <CardDescription>Visitors by device type</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <DonutChart
-                      className="h-60"
-                      data={prepareDeviceDataWithColors()}
-                      category="value"
-                      index="name"
-                      colors={["#0ea5e9", "#8b5cf6", "#10b981", "#f59e0b"]}
-                      valueFormatter={(number: number) => `${number} visitors`}
-                      showAnimation
-                      showTooltip
-                      showLabel
-                      customTooltip={(props) => {
-                        return (
-                          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
-                            <h3 className="font-semibold mb-2">Device Breakdown</h3>
-                            <p className="text-sm text-gray-500 mb-3">Visitors by device type</p>
-                            
-                            <div className="space-y-2">
-                              {props.payload?.map((item: { color: any; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; value: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
-                                <div key={index} className="flex justify-between items-center">
-                                  <div className="flex items-center">
-                                    <div 
-                                      className="h-3 w-3 rounded-full mr-2" 
-                                      style={{ backgroundColor: item.color }}
-                                    ></div>
-                                    <span className="text-sm">{item.name}</span>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                      <Pie
+                          data={prepareDeviceDataWithColors()}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                          nameKey="name"
+                        >
+                          {prepareDeviceDataWithColors().map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color || deviceColors[entry.name] || "#0ea5e9"} />
+                          ))}
+                          <LabelList
+                            dataKey="name"
+                            position="outside"
+                            content={({ x, y, value }: any) => (
+                              <text
+                                x={x}
+                                y={y}
+                                fill="#FFFFFF"
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                fontSize={14}
+                                fontWeight={600}
+                              >
+                                {value}
+                              </text>
+                            )}
+                          />
+                        </Pie>
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
+                                  <h3 className="font-semibold mb-2">Device Breakdown</h3>
+                                  <p className="text-sm text-gray-500 mb-3">Visitors by device type</p>
+                                  <div className="space-y-2">
+                                    {payload.map((entry, index) => (
+                                      <div key={index} className="flex justify-between items-center">
+                                        <div className="flex items-center">
+                                          <div
+                                            className="h-3 w-3 rounded-full mr-2"
+                                            style={{ backgroundColor: entry.payload.color }}
+                                          ></div>
+                                          <span className="text-sm">{entry.name}</span>
+                                        </div>
+                                        <span className="text-sm font-medium">{entry.value} visitors</span>
+                                      </div>
+                                    ))}
                                   </div>
-                                  <span className="text-sm font-medium">
-                                    {item.value} visitors
-                                  </span>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }}
-                    />
+                              )
+                            }
+                            return null
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
                     <div className="mt-4 flex flex-wrap justify-center gap-3">
                       {Object.entries(deviceColors).map(([name, color]) => (
                         <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
@@ -635,60 +662,86 @@ export default function AnalyticsPage() {
                 </Card>
 
                 <Card className="rounded-xl overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Globe className="h-5 w-5 mr-2 text-indigo-500" />
-                    Browser Breakdown
-                  </CardTitle>
-                  <CardDescription>Visitors by browser</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DonutChart
-                    className="h-60"
-                    data={prepareBrowserDataWithColors()}
-                    category="value"
-                    index="name"
-                    colors={Object.values(browserColors)}
-                    valueFormatter={(number: number) => `${number} visitors`}
-                    showAnimation
-                    showTooltip
-                    showLabel
-                    customTooltip={(props) => {
-                      return (
-                        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
-                          <h3 className="font-semibold mb-2">Browser Breakdown</h3>
-                          <p className="text-sm text-gray-500 mb-3">Visitors by browser</p>
-                          
-                          <div className="space-y-2">
-                            {props.payload?.map((item: { color: any; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; value: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }, index: Key | null | undefined) => (
-                              <div key={index} className="flex justify-between items-center">
-                                <div className="flex items-center">
-                                  <div 
-                                    className="h-3 w-3 rounded-full mr-2" 
-                                    style={{ backgroundColor: item.color }}
-                                  ></div>
-                                  <span className="text-sm">{item.name}</span>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Globe className="h-5 w-5 mr-2 text-indigo-500" />
+                      Browser Breakdown
+                    </CardTitle>
+                    <CardDescription>Visitors by browser</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={prepareBrowserDataWithColors()}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                          nameKey="name"
+                        >
+                          {prepareBrowserDataWithColors().map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color || browserColors[entry.name] || "#0ea5e9"} />
+                          ))}
+                          <LabelList
+                            dataKey="name"
+                            position="outside"
+                            content={({ x, y, value }: any) => (
+                              <text
+                                x={x}
+                                y={y}
+                                fill="#FFFFFF" 
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                fontSize={14}
+                                fontWeight={600}
+                              >
+                                {value}
+                              </text>
+                            )}
+                          />
+                        </Pie>
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
+                                  <h3 className="font-semibold mb-2">Browser Breakdown</h3>
+                                  <p className="text-sm text-gray-500 mb-3">Visitors by browser</p>
+                                  <div className="space-y-2">
+                                    {payload.map((entry, index) => (
+                                      <div key={index} className="flex justify-between items-center">
+                                        <div className="flex items-center">
+                                          <div
+                                            className="h-3 w-3 rounded-full mr-2"
+                                            style={{ backgroundColor: entry.payload.color }}
+                                          ></div>
+                                          <span className="text-sm">{entry.name}</span>
+                                        </div>
+                                        <span className="text-sm font-medium">{entry.value} visitors</span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                                <span className="text-sm font-medium">
-                                  {item.value} visitors
-                                </span>
-                              </div>
-                            ))}
-                          </div>
+                              )
+                            }
+                            return null
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
+                      {Object.entries(browserColors).map(([name, color]) => (
+                        <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
+                          <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
+                          <span className="text-sm">{name}</span>
                         </div>
-                      );
-                    }}
-                  />
-                  <div className="mt-4 flex flex-wrap justify-center gap-2">
-                    {Object.entries(browserColors).map(([name, color]) => (
-                      <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
-                        <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
-                        <span className="text-sm">{name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </>
           )}
