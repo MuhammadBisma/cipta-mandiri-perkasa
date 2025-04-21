@@ -5,7 +5,7 @@ import { createGzip } from "zlib"
 import { pipeline } from "stream/promises"
 import { createWriteStream } from "fs"
 import { Readable } from "stream"
-import { getSession } from "@/lib/auth"
+import { getSession } from "./auth"
 
 const prisma = new PrismaClient()
 const BACKUP_DIR = path.join(process.cwd(), "backups")

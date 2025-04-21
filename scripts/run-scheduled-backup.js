@@ -1,13 +1,19 @@
-const { runScheduledBackups } = require('../lib/backup');
+const { execSync } = require("child_process")
+const path = require("path")
 
-async function main() {
+function main() {
   try {
-    console.log('Running scheduled backups...');
-    await runScheduledBackups();
-    console.log('Scheduled backups completed successfully');
+    console.log("Running scheduled backups...")
+
+    // Gunakan ts-node untuk menjalankan script TypeScript
+    const scriptPath = path.resolve(__dirname, "run-backup.ts")
+    execSync(`npx ts-node ${scriptPath}`, { stdio: "inherit" })
+
+    console.log("Scheduled backups completed successfully")
   } catch (error) {
-    console.error('Error running scheduled backups:', error);
+    console.error("Error running scheduled backups:", error)
+    process.exit(1)
   }
 }
 
-main();
+main()
