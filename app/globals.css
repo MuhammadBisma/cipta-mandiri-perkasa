@@ -98,3 +98,23 @@ body {
 .ProseMirror li {
   margin-bottom: 0.5rem;
 }
+
+.DashboardCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Mengatur konten menjadi rata tengah secara vertikal */
+  align-items: center; /* Mengatur konten menjadi rata tengah secara horizontal */
+  padding: 20px; /* Pastikan padding seragam */
+}
+
+/* Untuk badge */
+.badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}

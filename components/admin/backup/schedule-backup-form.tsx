@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Calendar, Clock, Save, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
+import { SuccessScheduleModal } from "./success-schedule-modal"
+import { ErrorScheduleModal } from "./error-schedule-modal"
 
 export default function ScheduleBackupForm() {
   const [autoBackupEnabled, setAutoBackupEnabled] = useState(false)
@@ -19,6 +21,9 @@ export default function ScheduleBackupForm() {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   // Fetch the current schedule on component mount
   useEffect(() => {
@@ -75,11 +80,22 @@ export default function ScheduleBackupForm() {
         title: "Jadwal tersimpan",
         description: "Pengaturan jadwal backup berhasil disimpan",
       })
+
+      // Tampilkan modal sukses
+      setShowSuccessModal(true)
     } catch (error) {
       console.error("Error saving backup schedule:", error)
+
+      // Simpan pesan error
+      const errorMsg = error instanceof Error ? error.message : "Failed to update backup schedule"
+      setErrorMessage(errorMsg)
+
+      // Tampilkan modal error
+      setShowErrorModal(true)
+
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update backup schedule",
+        description: errorMsg,
         variant: "destructive",
       })
     } finally {
@@ -137,17 +153,26 @@ export default function ScheduleBackupForm() {
               <div className="space-y-2">
                 <Label htmlFor="backup-frequency">Frekuensi Backup</Label>
                 <Select value={backupFrequency} onValueChange={setBackupFrequency}>
-                <SelectTrigger id="backup-frequency">
-                  <SelectValue placeholder="Pilih frekuensi" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                  <SelectItem value="HOURLY" className="data-[state=checked]:bg-gray-100">Setiap Jam</SelectItem>
-                  <SelectItem value="DAILY" className="data-[state=checked]:bg-gray-100">Harian</SelectItem>
-                  <SelectItem value="WEEKLY" className="data-[state=checked]:bg-gray-100">Mingguan</SelectItem>
-                  <SelectItem value="MONTHLY" className="data-[state=checked]:bg-gray-100">Bulanan</SelectItem>
-                </SelectContent>
-              </Select>
+                  <SelectTrigger id="backup-frequency">
+                    <SelectValue placeholder="Pilih frekuensi" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                    <SelectItem value="HOURLY" className="data-[state=checked]:bg-gray-100">
+                      Setiap Jam
+                    </SelectItem>
+                    <SelectItem value="DAILY" className="data-[state=checked]:bg-gray-100">
+                      Harian
+                    </SelectItem>
+                    <SelectItem value="WEEKLY" className="data-[state=checked]:bg-gray-100">
+                      Mingguan
+                    </SelectItem>
+                    <SelectItem value="MONTHLY" className="data-[state=checked]:bg-gray-100">
+                      Bulanan
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="backup-time">Waktu Backup</Label>
                 <Input
@@ -222,6 +247,22 @@ export default function ScheduleBackupForm() {
           )}
         </Button>
       </CardFooter>
+
+      {/* Modal Sukses */}
+      <SuccessScheduleModal
+        open={showSuccessModal}
+        onOpenChange={setShowSuccessModal}
+        frequency={backupFrequency}
+        time={backupTime}
+      />
+
+      {/* Modal Error */}
+      <ErrorScheduleModal
+        open={showErrorModal}
+        onOpenChange={setShowErrorModal}
+        errorMessage={errorMessage}
+        onRetry={handleSaveSchedule}
+      />
     </Card>
   )
 }

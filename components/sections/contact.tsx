@@ -263,15 +263,6 @@ export default function Contact() {
                 >
                   <Twitter className="h-5 w-5" />
                 </a>
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="h-12 w-12 rounded-full bg-blue-700 hover:bg-blue-800 flex items-center justify-center text-white transition-colors duration-300"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
               </div>
             </motion.div>
           </motion.div>
@@ -294,26 +285,26 @@ export default function Contact() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="name">Nama Lengkap</Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Nama Anda" />
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all placeholder:text-gray-400 placeholder:opacity-50" placeholder="Masukkan Nama Anda" />
                   {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Email Anda" />
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all placeholder:text-gray-400 placeholder:opacity-50" placeholder="Masukkan Email Anda" />
                   {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="phone">Nomor Telepon</Label>
-                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Nomor Telepon Anda" />
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all placeholder:text-gray-400 placeholder:opacity-50" placeholder="Masukkan Nomor Telepon Anda" />
                   {errors.phone && <p className="text-sm text-red-500 mt-1">{errors.phone}</p>}
                 </div>
               </div>
 
               <div>
                 <Label htmlFor="message">Pesan</Label>
-                <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all" placeholder="Masukkan Pesan Anda" />
+                <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className="rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 px-4 py-2 shadow-sm transition-all placeholder:text-gray-400 placeholder:opacity-50" placeholder="Masukkan Pesan Anda" />
                 {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
               </div>
 

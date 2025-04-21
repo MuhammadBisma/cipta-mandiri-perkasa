@@ -667,7 +667,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Equal-sized dashboard cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 grid-template-rows:repeat(auto-fill, minmax(0, 1fr))">
         <div className="h-full">
           <DashboardCard
             title="Blog Posts"
@@ -820,13 +820,13 @@ export default function AdminDashboard() {
         </motion.div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden">
+      {/* Statistik Pengunjung - Full Width */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden">
           <CardContent className="pt-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Statistik Pengunjung</h3>
@@ -853,16 +853,18 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
-        </motion.div>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
+      {/* Layanan Terpopuler - Full Width di bawah Statistik Pengunjung */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <Card className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Layanan Terpopuler</h3>
+            <div className="grid md:grid-cols-2 gap-6">
               {serviceData.length > 0 ? (
                 <div className="h-72">
                   <ResponsiveContainer width="100%" height="100%">
@@ -894,27 +896,31 @@ export default function AdminDashboard() {
                   <p className="text-gray-500">Tidak ada data layanan tersedia</p>
                 </div>
               )}
-              {/* Service legend */}
+
+              {/* Service legend - Dipindahkan ke samping chart pada layar medium ke atas */}
               {serviceData.length > 0 && (
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {serviceData.map((service, index) => (
-                    <Button
-                      key={index}
-                      variant="ghost"
-                      size="sm"
-                      className="justify-start hover:bg-gray-100 rounded-lg"
-                      onClick={() => handleServiceClick(service)}
-                    >
-                      <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
-                      <span className="truncate">{service.name}</span>
-                    </Button>
-                  ))}
+                <div className="flex flex-col justify-center">
+                  <h4 className="text-sm font-medium text-gray-500 mb-3">Daftar Layanan</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2">
+                    {serviceData.map((service, index) => (
+                      <Button
+                        key={index}
+                        variant="ghost"
+                        size="sm"
+                        className="justify-start hover:bg-gray-100 rounded-lg"
+                        onClick={() => handleServiceClick(service)}
+                      >
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: service.color }}></div>
+                        <span className="truncate">{service.name}</span>
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <ActivityCard
