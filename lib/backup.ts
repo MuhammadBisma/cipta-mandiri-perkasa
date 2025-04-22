@@ -456,23 +456,72 @@ function calculateNextRun(frequency: string, time: string): Date {
   return nextRun
 }
 
-// Modifikasi fungsi runScheduledBackups untuk menggunakan semua tabel
-export async function runScheduledBackups(): Promise<void> {
+// Tambahkan fungsi ini di file lib/backup.ts
+
+// Fungsi untuk memeriksa apakah backup perlu dijalankan
+export async function shouldRunBackup(): Promise<boolean> {
   const schedule = await prisma.backupSchedule.findFirst()
 
   if (!schedule || !schedule.enabled || !schedule.nextRun) {
-    return
+    console.log("Backup is disabled or not scheduled")
+    return false
   }
 
   const now = new Date()
-  if (schedule.nextRun > now) {
+  const nextRun = new Date(schedule.nextRun)
+
+  // Tambahkan buffer 5 menit untuk menghindari masalah timing
+  const buffer = 5 * 60 * 1000 // 5 menit dalam milidetik
+  const shouldRun =
+    nextRun.getTime() <= now.getTime() + buffer &&
+    (!schedule.lastRun || new Date(schedule.lastRun).getTime() < nextRun.getTime() - buffer)
+
+  if (shouldRun) {
+    console.log(`Backup should run. Next scheduled time: ${nextRun.toISOString()}, Current time: ${now.toISOString()}`)
+  } else {
+    console.log(
+      `Backup should not run yet. Next scheduled time: ${nextRun.toISOString()}, Current time: ${now.toISOString()}`,
+    )
+  }
+
+  return shouldRun
+}
+
+// Modifikasi fungsi runScheduledBackups
+export async function runScheduledBackups(): Promise<void> {
+  // Periksa apakah backup perlu dijalankan
+  if (!(await shouldRunBackup())) {
     return
   }
 
+  const schedule = await prisma.backupSchedule.findFirst()
+  if (!schedule) return
+
   try {
+    // Tambahkan lock untuk mencegah backup ganda
+    const lockId = `backup_lock_${new Date().toISOString()}`
+
+    // Coba update lastRun sebagai lock
+    const updated = await prisma.backupSchedule.updateMany({
+      where: {
+        id: schedule.id,
+        lastRun: schedule.lastRun, // Hanya update jika lastRun belum berubah
+      },
+      data: {
+        lastRun: new Date(),
+      },
+    })
+
+    // Jika tidak ada yang diupdate, berarti ada proses lain yang sedang berjalan
+    if (updated.count === 0) {
+      console.log("Another backup process is already running")
+      return
+    }
+
     // Dapatkan semua model Prisma
     const models = await getPrismaModels()
 
+    const now = new Date()
     const backupName = `Scheduled ${schedule.frequency.toLowerCase()} backup - ${now.toLocaleDateString()}`
 
     // Jalankan backup dengan semua model
@@ -492,12 +541,11 @@ export async function runScheduledBackups(): Promise<void> {
       await deleteBackup(backup.id)
     }
 
-    // Perbarui waktu terakhir dan berikutnya
+    // Perbarui waktu berikutnya
     const nextRun = calculateNextRun(schedule.frequency, schedule.time)
     await prisma.backupSchedule.update({
       where: { id: schedule.id },
       data: {
-        lastRun: now,
         nextRun,
       },
     })

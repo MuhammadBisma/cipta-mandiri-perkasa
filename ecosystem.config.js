@@ -14,12 +14,12 @@ module.exports = {
     {
       name: "backup-checker",
       script: "scripts/run-scheduled-backup.js",
-      cron_restart: "*/5 * * * *",
+      cron_restart: "*/30 * * * *", // Cek setiap 30 menit
       autorestart: false,
       watch: false,
       env: {
         NODE_ENV: "production",
       },
-    }
+    },
   ],
 }

@@ -1,24 +1,46 @@
+// Script untuk dijalankan oleh crontab
+require("dotenv").config()
 const { execSync } = require("child_process")
 const path = require("path")
+const fs = require("fs")
 
-function main() {
-  try {
-    console.log(`[${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}] Running scheduled backups...`)
+// Path ke direktori proyek
+const projectDir = path.resolve(__dirname, "..")
+const logDir = path.join(projectDir, "logs")
 
-    // Gunakan ts-node untuk menjalankan script TypeScript
-    const scriptPath = path.resolve(__dirname, "run-backup.ts")
-    execSync(`npx ts-node ${scriptPath}`, { stdio: "inherit" })
-
-    console.log(
-      `[${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}] Scheduled backups completed successfully`,
-    )
-  } catch (error) {
-    console.error(
-      `[${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}] Error running scheduled backups:`,
-      error,
-    )
-    process.exit(1)
-  }
+// Pastikan direktori log ada
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true })
 }
 
-main()
+// Nama file log dengan timestamp
+const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
+const logFile = path.join(logDir, `backup-${timestamp}.log`)
+
+try {
+  console.log(`Starting scheduled backup at ${new Date().toISOString()}`)
+
+  // Jalankan prisma db pull untuk memastikan schema up-to-date
+  execSync("npx prisma db pull", {
+    cwd: projectDir,
+    stdio: "inherit",
+  })
+
+  // Jalankan script backup dengan node
+  const result = execSync("node -r ts-node/register/transpile-only ./scripts/run-backup.ts", {
+    cwd: projectDir,
+    encoding: "utf8",
+  })
+
+  // Tulis output ke log file
+  fs.writeFileSync(logFile, result)
+
+  console.log(`Backup completed successfully. Log saved to ${logFile}`)
+} catch (error) {
+  console.error("Error running scheduled backup:", error)
+
+  // Tulis error ke log file
+  fs.writeFileSync(logFile, `ERROR: ${error.message}\n${error.stack}`)
+
+  process.exit(1)
+}

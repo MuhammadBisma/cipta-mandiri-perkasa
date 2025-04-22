@@ -1,18 +1,14 @@
-import { runScheduledBackups } from "@/lib/backup"
-import { initScheduledBackups } from "@/lib/cron"
+// File untuk menjalankan backup dengan ts-node
+import { runScheduledBackups } from "../lib/backup"
 
 async function main() {
   try {
-    console.log("Initializing scheduled backups...")
-    await initScheduledBackups()
-
-    console.log("Running scheduled backups...")
+    console.log(`Executing scheduled backup at ${new Date().toISOString()}...`)
     await runScheduledBackups()
-
-    console.log("Scheduled backups completed successfully")
+    console.log("Backup completed successfully")
     process.exit(0)
   } catch (error) {
-    console.error("Error running scheduled backups:", error)
+    console.error("Error executing backup:", error)
     process.exit(1)
   }
 }
