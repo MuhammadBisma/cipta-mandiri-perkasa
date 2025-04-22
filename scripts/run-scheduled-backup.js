@@ -21,7 +21,7 @@ try {
   console.log(`Starting scheduled backup at ${new Date().toISOString()}`)
 
   // Jalankan prisma db pull untuk memastikan schema up-to-date
-  execSync("npx prisma db pull", {
+  execSync("sudo npx prisma db pull", {
     cwd: projectDir,
     stdio: "inherit",
   })
