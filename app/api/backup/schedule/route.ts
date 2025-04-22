@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getSession } from "@/lib/auth"
-import { getBackupSchedule, updateBackupSchedule } from "@/lib/backup"
+import { getBackupSchedule } from "@/lib/backup"
+import { updateBackupSchedule } from "@/lib/cron"
 
 export async function GET(_request: Request) {
   try {
@@ -41,8 +42,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "All schedule parameters are required" }, { status: 400 })
     }
 
-    // Update the backup schedule
-    const schedule = await updateBackupSchedule(enabled, frequency, time, retentionDays)
+    // Update the backup schedule and initialize cron job
+    await updateBackupSchedule(enabled, frequency, time, retentionDays)
+
+    // Get updated schedule
+    const schedule = await getBackupSchedule()
 
     return NextResponse.json({
       success: true,

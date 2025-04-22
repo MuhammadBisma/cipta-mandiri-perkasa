@@ -4,6 +4,7 @@ import { createBackup, getAvailableTables } from "@/lib/backup"
 import prisma from "@/lib/db"
 import { BackupStatus } from "@prisma/client"
 
+// Modifikasi fungsi GET untuk menampilkan semua backup termasuk yang terjadwal
 export async function GET(request: Request) {
   try {
     // Check if user is authenticated
@@ -16,6 +17,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const limit = searchParams.get("limit") ? Number.parseInt(searchParams.get("limit") as string) : undefined
     const search = searchParams.get("search") || undefined
+    const type = searchParams.get("type") || undefined
 
     // Build the query
     const query: any = {}
@@ -24,6 +26,10 @@ export async function GET(request: Request) {
         { name: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
       ]
+    }
+
+    if (type) {
+      query.type = type
     }
 
     // Fetch backups from the database
@@ -51,7 +57,7 @@ export async function GET(request: Request) {
       type: backup.type,
       status: backup.status,
       tables: backup.tables,
-      createdBy: backup.createdBy.name,
+      createdBy: backup.createdBy?.name || "System",
     }))
 
     return NextResponse.json(formattedBackups)

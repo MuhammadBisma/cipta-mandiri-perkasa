@@ -54,6 +54,7 @@ export default function ScheduleBackupForm() {
     }
   }
 
+  // Modifikasi fungsi handleSaveSchedule untuk menampilkan informasi yang lebih jelas
   const handleSaveSchedule = async () => {
     setIsSaving(true)
 
@@ -76,13 +77,18 @@ export default function ScheduleBackupForm() {
         throw new Error(data.error || "Failed to update backup schedule")
       }
 
+      const result = await response.json()
+
       toast({
         title: "Jadwal tersimpan",
-        description: "Pengaturan jadwal backup berhasil disimpan",
+        description: `Pengaturan jadwal backup berhasil disimpan. Backup ${backupFrequency.toLowerCase()} akan berjalan pada pukul ${backupTime}.`,
       })
 
-      // Tampilkan modal sukses
+      // Tampilkan modal sukses dengan informasi jadwal berikutnya
       setShowSuccessModal(true)
+
+      // Refresh data jadwal
+      fetchSchedule()
     } catch (error) {
       console.error("Error saving backup schedule:", error)
 
@@ -253,8 +259,7 @@ export default function ScheduleBackupForm() {
         open={showSuccessModal}
         onOpenChange={setShowSuccessModal}
         frequency={backupFrequency}
-        time={backupTime}
-      />
+        time={backupTime} nextRun={null}      />
 
       {/* Modal Error */}
       <ErrorScheduleModal

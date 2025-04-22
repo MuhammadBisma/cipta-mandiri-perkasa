@@ -16,6 +16,7 @@ interface SuccessScheduleModalProps {
   onOpenChange: (open: boolean) => void
   frequency: string
   time: string
+  nextRun: string | null
 }
 
 export function SuccessScheduleModal({ open, onOpenChange, frequency, time }: SuccessScheduleModalProps) {

@@ -15,6 +15,22 @@ if (!fs.existsSync(BACKUP_DIR)) {
   fs.mkdirSync(BACKUP_DIR, { recursive: true })
 }
 
+// Fungsi untuk mendapatkan semua model Prisma
+async function getPrismaModels() {
+  // Daftar model yang diketahui dalam aplikasi
+  return [
+    "User",
+    "BlogPost",
+    "Gallery",
+    "Testimonial",
+    "Backup",
+    "BackupSchedule",
+    "Visitor",
+    "PageView",
+    "DailyAnalytics",
+  ]
+}
+
 export async function createBackup(
   name: string,
   tables: string[],
@@ -59,43 +75,77 @@ export async function createBackup(
       data: {},
     }
 
+    // Daftar handler untuk setiap tabel
+    const tableHandlers: Record<string, () => Promise<any>> = {
+      User: async () => {
+        console.log("Backing up table: User")
+        const users = await prisma.user.findMany({
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        })
+        return users
+      },
+      BlogPost: async () => {
+        console.log("Backing up table: BlogPost")
+        const blogPosts = await prisma.blogPost.findMany()
+        return blogPosts
+      },
+      Gallery: async () => {
+        console.log("Backing up table: Gallery")
+        const gallery = await prisma.gallery.findMany()
+        return gallery
+      },
+      Testimonial: async () => {
+        console.log("Backing up table: Testimonial")
+        const testimonials = await prisma.testimonial.findMany()
+        return testimonials
+      },
+      Backup: async () => {
+        console.log("Backing up table: Backup")
+        const backups = await prisma.backup.findMany()
+        return backups
+      },
+      BackupSchedule: async () => {
+        console.log("Backing up table: BackupSchedule")
+        const backupSchedules = await prisma.backupSchedule.findMany()
+        return backupSchedules
+      },
+      Visitor: async () => {
+        console.log("Backing up table: Visitor")
+        const visitors = await prisma.visitor.findMany()
+        return visitors
+      },
+      PageView: async () => {
+        console.log("Backing up table: PageView")
+        const pageViews = await prisma.pageView.findMany()
+        return pageViews
+      },
+      DailyAnalytics: async () => {
+        console.log("Backing up table: DailyAnalytics")
+        const dailyAnalytics = await prisma.dailyAnalytics.findMany()
+        return dailyAnalytics
+      },
+    }
+
+    // Proses backup untuk setiap tabel
     for (const table of tables) {
-      switch (table) {
-        case "users":
-          const users = await prisma.user.findMany({
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              role: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          })
-          backupData.data.users = users
-          break
-        case "blog_posts":
-          const blogPosts = await prisma.blogPost.findMany()
-          backupData.data.blog_posts = blogPosts
-          break
-        case "gallery":
-          const gallery = await prisma.gallery.findMany()
-          backupData.data.gallery = gallery
-          break
-        case "testimonials":
-          const testimonials = await prisma.testimonial.findMany()
-          backupData.data.testimonials = testimonials
-          break
-        case "backups":
-          const backups = await prisma.backup.findMany()
-          backupData.data.backups = backups
-          break
-        case "backup_schedules":
-          const backupSchedules = await prisma.backupSchedule.findMany()
-          backupData.data.backup_schedules = backupSchedules
-          break
-        default:
-          console.warn(`Unknown table: ${table}`)
+      try {
+        if (tableHandlers[table]) {
+          backupData.data[table] = await tableHandlers[table]()
+        } else if (table === "_prisma_migrations") {
+          console.log("Skipping system table: _prisma_migrations")
+        } else {
+          console.log(`Skipping unknown table: ${table}`)
+        }
+      } catch (tableError) {
+        console.error(`Error backing up table ${table}:`, tableError)
+        // Lanjutkan ke tabel berikutnya meskipun ada error
       }
     }
 
@@ -174,11 +224,11 @@ export async function restoreBackup(backupId: string): Promise<boolean> {
     await prisma.$transaction(async (tx) => {
       for (const table of backup.tables) {
         switch (table) {
-          case "blog_posts":
-            if (backupData.data.blog_posts) {
+          case "BlogPost":
+            if (backupData.data.BlogPost) {
               await tx.blogPost.deleteMany({})
 
-              for (const post of backupData.data.blog_posts) {
+              for (const post of backupData.data.BlogPost) {
                 await tx.blogPost.create({
                   data: {
                     id: post.id,
@@ -197,11 +247,11 @@ export async function restoreBackup(backupId: string): Promise<boolean> {
               }
             }
             break
-          case "gallery":
-            if (backupData.data.gallery) {
+          case "Gallery":
+            if (backupData.data.Gallery) {
               await tx.gallery.deleteMany({})
 
-              for (const item of backupData.data.gallery) {
+              for (const item of backupData.data.Gallery) {
                 await tx.gallery.create({
                   data: {
                     id: item.id,
@@ -217,11 +267,11 @@ export async function restoreBackup(backupId: string): Promise<boolean> {
               }
             }
             break
-          case "testimonials":
-            if (backupData.data.testimonials) {
+          case "Testimonial":
+            if (backupData.data.Testimonial) {
               await tx.testimonial.deleteMany({})
 
-              for (const testimonial of backupData.data.testimonials) {
+              for (const testimonial of backupData.data.Testimonial) {
                 await tx.testimonial.create({
                   data: {
                     id: testimonial.id,
@@ -239,7 +289,7 @@ export async function restoreBackup(backupId: string): Promise<boolean> {
             }
             break
           default:
-            console.warn(`Skipping table: ${table}`)
+            console.warn(`Skipping table restore: ${table}`)
         }
       }
     })
@@ -299,29 +349,33 @@ export async function deleteBackup(backupId: string): Promise<boolean> {
 }
 
 export async function getAvailableTables(): Promise<{ id: string; name: string; count: number; size: string }[]> {
-  const [userCount, blogPostCount, galleryCount, testimonialCount] = await Promise.all([
-    prisma.user.count(),
-    prisma.blogPost.count(),
-    prisma.gallery.count(),
-    prisma.testimonial.count(),
-  ])
+  // Dapatkan semua model Prisma
+  const models = await getPrismaModels()
 
-  return [
-    { id: "users", name: "Users", count: userCount, size: `${Math.round(userCount * 0.5 * 10) / 10} KB` },
-    {
-      id: "blog_posts",
-      name: "Blog Posts",
-      count: blogPostCount,
-      size: `${Math.round(blogPostCount * 2 * 10) / 10} KB`,
-    },
-    { id: "gallery", name: "Gallery", count: galleryCount, size: `${Math.round(galleryCount * 1.5 * 10) / 10} KB` },
-    {
-      id: "testimonials",
-      name: "Testimonials",
-      count: testimonialCount,
-      size: `${Math.round(testimonialCount * 1 * 10) / 10} KB`,
-    },
-  ]
+  // Buat array untuk menyimpan hasil
+  const result: { id: string; name: string; count: number; size: string }[] = []
+
+  // Dapatkan jumlah record untuk setiap model
+  for (const model of models) {
+    try {
+      // @ts-ignore - Akses dinamis ke model Prisma
+      const count = await prisma[model.charAt(0).toLowerCase() + model.slice(1)].count()
+
+      // Estimasi ukuran berdasarkan jumlah record
+      const estimatedSize = Math.round(count * 1.5 * 10) / 10
+
+      result.push({
+        id: model,
+        name: model.replace(/([A-Z])/g, " $1").trim(), // PascalCase to Title Case
+        count,
+        size: `${estimatedSize} KB`,
+      })
+    } catch (error) {
+      console.warn(`Could not get count for model ${model}:`, error)
+    }
+  }
+
+  return result
 }
 
 export async function getBackupSchedule(): Promise<any> {
@@ -402,6 +456,7 @@ function calculateNextRun(frequency: string, time: string): Date {
   return nextRun
 }
 
+// Modifikasi fungsi runScheduledBackups untuk menggunakan semua tabel
 export async function runScheduledBackups(): Promise<void> {
   const schedule = await prisma.backupSchedule.findFirst()
 
@@ -415,12 +470,15 @@ export async function runScheduledBackups(): Promise<void> {
   }
 
   try {
-    const backupName = `Scheduled ${schedule.frequency.toLowerCase()} backup`
+    // Dapatkan semua model Prisma
+    const models = await getPrismaModels()
 
-    const tables = ["users", "blog_posts", "gallery", "testimonials"]
+    const backupName = `Scheduled ${schedule.frequency.toLowerCase()} backup - ${now.toLocaleDateString()}`
 
-    await createBackup(backupName, tables, "Automatically created by scheduler", BackupType.SCHEDULED)
+    // Jalankan backup dengan semua model
+    await createBackup(backupName, models, "Automatically created by scheduler", BackupType.SCHEDULED)
 
+    // Hapus backup lama berdasarkan retensi
     const oldBackups = await prisma.backup.findMany({
       where: {
         type: BackupType.SCHEDULED,
@@ -434,6 +492,7 @@ export async function runScheduledBackups(): Promise<void> {
       await deleteBackup(backup.id)
     }
 
+    // Perbarui waktu terakhir dan berikutnya
     const nextRun = calculateNextRun(schedule.frequency, schedule.time)
     await prisma.backupSchedule.update({
       where: { id: schedule.id },
@@ -442,6 +501,8 @@ export async function runScheduledBackups(): Promise<void> {
         nextRun,
       },
     })
+
+    console.log(`Scheduled backup completed successfully. Next run: ${nextRun}`)
   } catch (error) {
     console.error("Scheduled backup error:", error)
   }

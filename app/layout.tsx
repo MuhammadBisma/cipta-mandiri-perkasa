@@ -8,6 +8,7 @@ import PageViewTracker from "@/components/analytics/page-view-tracker"
 import FloatingContactButton from "@/components/floating-contact-button"
 import { Suspense } from "react"
 import StructuredData from "@/components/seo/structured-data"
+import "@/lib/init-cron"
 
 const inter = Inter({ subsets: ["latin"] })
 

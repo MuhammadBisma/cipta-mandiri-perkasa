@@ -703,7 +703,7 @@ export default function AdminDashboard() {
         </div>
         <div className="h-full">
           <DashboardCard
-            title="Pending Approvals"
+            title="Pending Testimoni"
             value={data?.pendingTestimonialCount || 0}
             icon={<Users className="h-8 w-8" />}
             description="Testimoni menunggu persetujuan"
