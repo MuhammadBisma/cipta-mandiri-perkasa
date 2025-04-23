@@ -12,14 +12,12 @@ module.exports = {
       },
     },
     {
-      name: "backup-checker",
-      script: "node",
-      args: "scripts/run-backup-robust.js",  
+      name: "backup-daemon",
+      script: "scripts/backup-daemon.js",
       instances: 1,
       exec_mode: "fork",
-      cron_restart: "*/15 * * * *",  // Restart setiap 15 menit
-      autorestart: true,
       watch: false,
+      autorestart: true,
       env: {
         NODE_ENV: "production",
       },
