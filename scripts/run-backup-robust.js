@@ -11,8 +11,10 @@ const { Readable } = require("stream");
 // Inisialisasi Prisma
 const prisma = new PrismaClient();
 
-// Path ke direktori backup
+// Konfigurasi
+const ADMIN_USER_ID = process.env.ADMIN_USER_ID || "39d9693c-92e7-4b80-aef8-e688c957eae3";
 const BACKUP_DIR = path.join(process.cwd(), "backups");
+const LOG_DIR = path.join(process.cwd(), "logs");
 
 // Pastikan direktori backups ada
 if (!fs.existsSync(BACKUP_DIR)) {
@@ -20,7 +22,6 @@ if (!fs.existsSync(BACKUP_DIR)) {
 }
 
 // Log file
-const LOG_DIR = path.join(process.cwd(), "logs");
 if (!fs.existsSync(LOG_DIR)) {
   fs.mkdirSync(LOG_DIR, { recursive: true });
 }
@@ -34,11 +35,56 @@ function log(message) {
   fs.appendFileSync(logFile, logMessage);
 }
 
+// Fungsi untuk menghitung next run
+function calculateNextRun(frequency, time) {
+  const now = new Date();
+  const nextRun = new Date(now);
+
+  switch (frequency) {
+    case "DAILY":
+      nextRun.setDate(now.getDate() + 1);
+      break;
+    case "WEEKLY":
+      nextRun.setDate(now.getDate() + 7);
+      break;
+    case "MONTHLY":
+      nextRun.setMonth(now.getMonth() + 1);
+      break;
+    default:
+      throw new Error(`Unknown frequency: ${frequency}`);
+  }
+
+  if (time) {
+    const [hours, minutes] = time.split(":").map(Number);
+    nextRun.setHours(hours, minutes, 0, 0);
+  } else {
+    nextRun.setHours(0, 0, 0, 0);
+  }
+
+  return nextRun;
+}
+
 // Fungsi utama
 async function main() {
   log("Starting backup process");
 
   try {
+    // Periksa admin user
+    const adminUser = await prisma.user.findUnique({ 
+      where: { id: ADMIN_USER_ID },
+      select: { id: true, role: true }
+    });
+
+    if (!adminUser) {
+      log(`Admin user with ID ${ADMIN_USER_ID} not found`);
+      process.exit(1);
+    }
+
+    if (adminUser.role !== "ADMIN") {
+      log(`User ${ADMIN_USER_ID} does not have ADMIN role`);
+      process.exit(1);
+    }
+
     // Periksa apakah perlu menjalankan backup
     const schedule = await prisma.backupSchedule.findFirst();
 
@@ -90,7 +136,7 @@ async function main() {
       return;
     }
 
-    // Dapatkan semua model Prisma
+    // Daftar model yang akan dibackup
     const models = [
       "User",
       "BlogPost",
@@ -120,7 +166,7 @@ async function main() {
         type: "SCHEDULED",
         status: "IN_PROGRESS",
         createdBy: {
-          connect: { id: "39d9693c-92e7-4b80-aef8-e688c957eae3" }, // Ganti dengan ID user admin
+          connect: { id: ADMIN_USER_ID },
         },
       },
     });
@@ -137,7 +183,7 @@ async function main() {
           tables: models,
           type: "SCHEDULED",
           createdAt: now.toISOString(),
-          createdBy: "System",
+          createdBy: adminUser.id,
         },
         data: {},
       };
@@ -297,4 +343,5 @@ async function main() {
 // Menjalankan fungsi utama
 main().catch((e) => {
   console.error("Unexpected error: ", e);
+  process.exit(1);
 });
