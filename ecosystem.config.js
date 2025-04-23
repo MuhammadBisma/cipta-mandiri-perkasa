@@ -13,19 +13,16 @@ module.exports = {
     },
     {
       name: "backup-checker",
-      script: "scripts/run-scheduled-backup.js",
-      cron_restart: "*/30 * * * *",
-      autorestart: false, 
+      script: "node",
+      args: "scripts/run-backup-robust.js",  
+      instances: 1,
+      exec_mode: "fork",
+      cron_restart: "*/15 * * * *",  // Restart setiap 15 menit
+      autorestart: true,
       watch: false,
       env: {
         NODE_ENV: "production",
       },
-    },
-    {
-      name: "backup-monitor",
-      script: "scripts/monitor-backup-checker.js",
-      watch: false,
-      autorestart: true,
     },
   ],
 }
