@@ -1,4 +1,4 @@
-// Script backup yang lebih robust
+// Script untuk memaksa backup berjalan
 require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const fs = require("fs");
@@ -24,7 +24,7 @@ const LOG_DIR = path.join(process.cwd(), "logs");
 if (!fs.existsSync(LOG_DIR)) {
   fs.mkdirSync(LOG_DIR, { recursive: true });
 }
-const logFile = path.join(LOG_DIR, `backup-${new Date().toISOString().replace(/[:.]/g, "-")}.log`);
+const logFile = path.join(LOG_DIR, `force-backup-${new Date().toISOString().replace(/[:.]/g, "-")}.log`);
 
 // Fungsi untuk menulis log
 function log(message) {
@@ -36,60 +36,37 @@ function log(message) {
 
 // Fungsi utama
 async function main() {
-  log("Starting backup process");
-
+  log("Starting forced backup process");
+  
   try {
-    // Periksa apakah perlu menjalankan backup
+    // Periksa apakah ada konfigurasi backup
     const schedule = await prisma.backupSchedule.findFirst();
-
-    if (!schedule || !schedule.enabled) {
-      log("Backup scheduling is disabled or not configured");
-      return;
+    
+    if (!schedule) {
+      log("No backup schedule found. Creating default schedule.");
+      
+      // Buat jadwal default jika tidak ada
+      await prisma.backupSchedule.create({
+        data: {
+          enabled: true,
+          frequency: "DAILY",
+          time: "02:00",
+          retentionDays: 30,
+          nextRun: new Date(new Date().setHours(2, 0, 0, 0) + 24 * 60 * 60 * 1000),
+        },
+      });
+      
+      log("Default schedule created.");
+    } else if (!schedule.enabled) {
+      log("Backup schedule is disabled. Enabling it.");
+      
+      // Aktifkan jadwal jika dinonaktifkan
+      await prisma.backupSchedule.update({
+        where: { id: schedule.id },
+        data: { enabled: true },
+      });
     }
-
-    const now = new Date();
-    const nextRun = schedule.nextRun ? new Date(schedule.nextRun) : null;
-
-    if (!nextRun) {
-      log("No next run scheduled");
-      return;
-    }
-
-    // Tambahkan buffer 5 menit
-    const buffer = 5 * 60 * 1000; // 5 menit dalam milidetik
-
-    if (nextRun.getTime() > now.getTime() + buffer) {
-      log(`Next backup scheduled at ${nextRun.toISOString()}, skipping for now`);
-      return;
-    }
-
-    if (schedule.lastRun && new Date(schedule.lastRun).getTime() > nextRun.getTime() - buffer) {
-      log("Backup already ran recently");
-      return;
-    }
-
-    log(`Backup should run. Next scheduled time: ${nextRun.toISOString()}, Current time: ${now.toISOString()}`);
-
-    // Tambahkan lock untuk mencegah backup ganda
-    const lockId = `backup_lock_${new Date().toISOString()}`;
-
-    // Coba update lastRun sebagai lock
-    const updated = await prisma.backupSchedule.updateMany({
-      where: {
-        id: schedule.id,
-        lastRun: schedule.lastRun, // Hanya update jika lastRun belum berubah
-      },
-      data: {
-        lastRun: now,
-      },
-    });
-
-    // Jika tidak ada yang diupdate, berarti ada proses lain yang sedang berjalan
-    if (updated.count === 0) {
-      log("Another backup process is already running");
-      return;
-    }
-
+    
     // Dapatkan semua model Prisma
     const models = [
       "User",
@@ -102,29 +79,30 @@ async function main() {
       "PageView",
       "DailyAnalytics",
     ];
-
-    const backupName = `Scheduled ${schedule.frequency.toLowerCase()} backup - ${now.toLocaleDateString()}`;
-
+    
+    const now = new Date();
+    const backupName = `Forced backup - ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+    
     // Buat backup
     log(`Creating backup: ${backupName}`);
-
+    
     // Buat entri backup di database
     const backup = await prisma.backup.create({
       data: {
         name: backupName,
-        description: "Automatically created by scheduler",
+        description: "Manually forced backup",
         filePath: "",
         fileSize: 0,
         fileType: "json.gz",
         tables: models,
-        type: "SCHEDULED",
+        type: "MANUAL",
         status: "IN_PROGRESS",
         createdBy: {
           connect: { id: "1" }, // Ganti dengan ID user admin
         },
       },
     });
-
+    
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       const fileName = `backup-${backup.id}-${timestamp}.json.gz`;
@@ -133,20 +111,20 @@ async function main() {
         metadata: {
           id: backup.id,
           name: backupName,
-          description: "Automatically created by scheduler",
+          description: "Manually forced backup",
           tables: models,
-          type: "SCHEDULED",
+          type: "MANUAL",
           createdAt: now.toISOString(),
           createdBy: "System",
         },
         data: {},
       };
-
+      
       // Proses backup untuk setiap tabel
       for (const table of models) {
         try {
           log(`Backing up table: ${table}`);
-
+          
           // Dapatkan data dari tabel
           let tableData;
           switch (table) {
@@ -190,29 +168,30 @@ async function main() {
               log(`Skipping unknown table: ${table}`);
               continue;
           }
-
+          
           backupData.data[table] = tableData;
           log(`Backed up ${tableData.length} records from ${table}`);
         } catch (tableError) {
           log(`Error backing up table ${table}: ${tableError.message}`);
+          log(`Error stack: ${tableError.stack}`);
           // Lanjutkan ke tabel berikutnya meskipun ada error
         }
       }
-
+      
       const jsonData = JSON.stringify(backupData, null, 2);
-
+      
       log(`Writing backup to file: ${filePath}`);
       const gzip = createGzip();
       const source = Buffer.from(jsonData);
       const destination = createWriteStream(filePath);
-
+      
       await pipeline(Readable.from(source), gzip, destination);
-
+      
       const stats = fs.statSync(filePath);
       const fileSize = stats.size;
-
+      
       log(`Backup file created: ${filePath} (${fileSize} bytes)`);
-
+      
       // Update backup record
       await prisma.backup.update({
         where: { id: backup.id },
@@ -222,56 +201,11 @@ async function main() {
           status: "COMPLETED",
         },
       });
-
-      // Perbarui waktu berikutnya
-      const nextRun = calculateNextRun(schedule.frequency, schedule.time);
-      await prisma.backupSchedule.update({
-        where: { id: schedule.id },
-        data: {
-          nextRun,
-        },
-      });
-
-      log(`Backup completed successfully. Next run: ${nextRun}`);
-
-      // Hapus backup lama berdasarkan retensi
-      const oldBackups = await prisma.backup.findMany({
-        where: {
-          type: "SCHEDULED",
-          createdAt: {
-            lt: new Date(now.getTime() - schedule.retentionDays * 24 * 60 * 60 * 1000),
-          },
-        },
-      });
-
-      for (const oldBackup of oldBackups) {
-        log(`Deleting old backup: ${oldBackup.name}`);
-
-        try {
-          // Hapus file backup
-          if (oldBackup.filePath) {
-            const oldFilePath = path.join(BACKUP_DIR, oldBackup.filePath);
-            if (fs.existsSync(oldFilePath)) {
-              fs.unlinkSync(oldFilePath);
-            }
-          }
-
-          // Hapus record dari database
-          await prisma.backup.delete({
-            where: { id: oldBackup.id },
-          });
-        } catch (deleteError) {
-          log(`Error deleting old backup: ${deleteError.message}`);
-        }
-      }
+      
+      log(`Backup completed successfully.`);
     } catch (error) {
       log(`Error creating backup: ${error.message}`);
-      
-      // Menambahkan detail error
-      if (error.code) log(`Error code: ${error.code}`);
-      if (error.errno) log(`Error errno: ${error.errno}`);
-      if (error.syscall) log(`Error syscall: ${error.syscall}`);
-      if (error.path) log(`Error path: ${error.path}`);
+      log(`Error stack: ${error.stack}`);
       
       // Update backup record to failed
       await prisma.backup.update({
@@ -283,8 +217,9 @@ async function main() {
     }
   } catch (error) {
     log(`Error in backup process: ${error.message}`);
+    log(`Error stack: ${error.stack}`);
     
-    // Menambahkan detail error
+    // Log detail error tambahan
     if (error.code) log(`Error code: ${error.code}`);
     if (error.errno) log(`Error errno: ${error.errno}`);
     if (error.syscall) log(`Error syscall: ${error.syscall}`);
@@ -294,7 +229,14 @@ async function main() {
   }
 }
 
-// Menjalankan fungsi utama
-main().catch((e) => {
-  console.error("Unexpected error: ", e);
-});
+// Jalankan fungsi utama
+main()
+  .then(() => {
+    log("Forced backup script completed");
+    process.exit(0);
+  })
+  .catch((error) => {
+    log(`Fatal error: ${error.message}`);
+    log(`Error stack: ${error.stack}`);
+    process.exit(1);
+  });
