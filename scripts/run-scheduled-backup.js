@@ -21,26 +21,38 @@ try {
   console.log(`Starting scheduled backup at ${new Date().toISOString()}`)
 
   // Jalankan prisma db pull untuk memastikan schema up-to-date
-  execSync("sudo npx prisma db pull", {
-    cwd: projectDir,
-    stdio: "inherit",
-  })
+  try {
+    execSync("sudo npx prisma db pull", {
+      cwd: projectDir,
+      stdio: "inherit",
+    })
+  } catch (dbPullError) {
+    console.error("Warning: Failed to run prisma db pull:", dbPullError.message)
+    // Lanjutkan meskipun db pull gagal
+  }
 
   // Jalankan script backup dengan node
-  const result = execSync("node -r ts-node/register/transpile-only ./scripts/run-backup.ts", {
-    cwd: projectDir,
-    encoding: "utf8",
-  })
+  try {
+    const result = execSync("node -r ts-node/register/transpile-only ./scripts/run-backup.ts", {
+      cwd: projectDir,
+      encoding: "utf8",
+    })
 
-  // Tulis output ke log file
-  fs.writeFileSync(logFile, result)
+    // Tulis output ke log file
+    fs.writeFileSync(logFile, result)
 
-  console.log(`Backup completed successfully. Log saved to ${logFile}`)
+    console.log(`Backup completed successfully. Log saved to ${logFile}`)
+  } catch (backupError) {
+    console.error("Error running backup script:", backupError.message)
+    fs.writeFileSync(logFile, `ERROR: ${backupError.message}\n${backupError.stack}`)
+    // Jangan exit dengan kode error, biarkan proses tetap berjalan
+  }
 } catch (error) {
-  console.error("Error running scheduled backup:", error)
-
+  console.error("Error in backup process:", error.message)
   // Tulis error ke log file
   fs.writeFileSync(logFile, `ERROR: ${error.message}\n${error.stack}`)
-
-  process.exit(1)
+  // Jangan exit dengan kode error
 }
+
+// Tambahkan ini untuk memastikan proses tidak keluar terlalu cepat
+console.log("Backup checker completed, waiting for next schedule")
