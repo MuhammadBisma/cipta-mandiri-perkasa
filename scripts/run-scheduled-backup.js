@@ -56,3 +56,4 @@ try {
 
 // Tambahkan ini untuk memastikan proses tidak keluar terlalu cepat
 console.log("Backup checker completed, waiting for next schedule")
+process.exit(0)
