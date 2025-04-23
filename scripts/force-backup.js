@@ -90,12 +90,12 @@ async function main() {
     const backup = await prisma.backup.create({
       data: {
         name: backupName,
-        description: "Manually forced backup",
+        description: "Scheduled automatic backup",
         filePath: "",
         fileSize: 0,
         fileType: "json.gz",
         tables: models,
-        type: "MANUAL",
+        type: "SCHEDULED",
         status: "IN_PROGRESS",
         createdBy: {
           connect: { id: "550e8400-e29b-41d4-a716-446655440001" }, 
@@ -111,9 +111,9 @@ async function main() {
         metadata: {
           id: backup.id,
           name: backupName,
-          description: "Manually forced backup",
+          description: "Scheduled automatic backup",
           tables: models,
-          type: "MANUAL",
+          type: "SCHEDULED",
           createdAt: now.toISOString(),
           createdBy: "System",
         },
