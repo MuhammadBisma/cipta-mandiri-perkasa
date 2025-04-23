@@ -98,7 +98,7 @@ async function main() {
         type: "MANUAL",
         status: "IN_PROGRESS",
         createdBy: {
-          connect: { id: "39d9693c-92e7-4b80-aef8-e688c957eae3" }, 
+          connect: { id: "550e8400-e29b-41d4-a716-446655440001" }, 
         },
       },
     });
