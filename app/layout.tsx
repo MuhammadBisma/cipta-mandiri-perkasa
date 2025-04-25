@@ -371,10 +371,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="facebook-domain-verification" content="your-facebook-verification-code" />
         <meta name="google-site-verification" content="OF64XOunM58TdYUSGjWdl5U_v9zv7qhMPZgW-P-rApk" />
-        
-        {/* Preload critical resources */}
-        <link rel="preload" href="/fonts/your-font.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        
+        <link rel="canonical" href="https://kubahcmp.id" />
         {/* Structured Data */}
         <script
           type="application/ld+json"
