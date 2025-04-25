@@ -1,16 +1,24 @@
-import type React from "react"
+import type { ReactNode } from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import Script from "next/script"
+import { Suspense } from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import PageViewTracker from "@/components/analytics/page-view-tracker"
 import FloatingContactButton from "@/components/floating-contact-button"
-import { Suspense } from "react"
 import StructuredData from "@/components/seo/structured-data"
+import ErrorBoundary from "@/components/error-boundary"
+import LoadingIndicator from "@/components/loading-indicator"
 import "@/lib/init-cron"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-inter',
+  adjustFontFallback: false,
+  preload: true 
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kubahcmp.id"),
@@ -18,8 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Cipta Mandiri Perkasa",
     default: "Spesialis GRC Kubah Masjid & Ornamen Islami",
   },
-  description:
-    "Cipta Mandiri Perkasa adalah spesialis kubah masjid, masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
+  description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, masjid, mimbar, menara, kerawangan, dan kaligrafi dengan kualitas terbaik dan harga terjangkau.",
   keywords: [
     "kubah masjid",
     "mimbar masjid",
@@ -308,7 +315,6 @@ export const metadata: Metadata = {
     description: "Cipta Mandiri Perkasa adalah spesialis kubah masjid, mimbar, menara, kerawangan, dan kaligrafi.",
     images: ["https://kubahcmp.id/images/og-image.jpg"],
   },
-  
   authors: [{ name: "Cipta Mandiri Perkasa" }],
   creator: "Cipta Mandiri Perkasa",
   publisher: "Cipta Mandiri Perkasa",
@@ -317,36 +323,59 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  generator: "v0.dev",
+  generator: "Next.js",
   alternates: {
     canonical: "https://kubahcmp.id",
     languages: {
       "id-ID": "https://kubahcmp.id",
-      "en-US": "https://kubahcmp.id/en",
     },
   },
   verification: {
-    google: "google88e19c93b4b882d5.html",
+    google: "OF64XOunM58TdYUSGjWdl5U_v9zv7qhMPZgW-P-rApk",
     yandex: "yandex-verification-code",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: '/icons/favicon.ico' },
+      { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  other: {
+    'msapplication-TileColor': '#ffffff',
+    'theme-color': '#ffffff',
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning className={inter.variable}>
       <head>
-        <link rel="icon" href="/icons/favicon.ico?v=2" sizes="any" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=2" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png?v=2" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png?v=2" />
-        <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="facebook-domain-verification" content="your-facebook-verification-code" />
-        <meta name="google-site-verification" content="google88e19c93b4b882d5.html" />
+        <meta name="google-site-verification" content="OF64XOunM58TdYUSGjWdl5U_v9zv7qhMPZgW-P-rApk" />
+        
+        {/* Preload critical resources */}
+        <link rel="preload" href="/fonts/your-font.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -355,60 +384,97 @@ export default function RootLayout({
               "@type": "Organization",
               name: "Cipta Mandiri Perkasa",
               url: "https://kubahcmp.id",
-              logo: "https://kubahcmp.id/images/logo.png?v=2",
+              logo: "https://kubahcmp.id/images/logo.png",
+              sameAs: [
+                "https://facebook.com/yourpage",
+                "https://instagram.com/yourprofile",
+                "https://youtube.com/yourchannel"
+              ],
               contactPoint: {
                 "@type": "ContactPoint",
                 telephone: "+6281386225702",
                 contactType: "customer service",
+                areaServed: "Indonesia",
+                availableLanguage: ["Indonesian"]
               },
             }),
           }}
         />
       </head>
-      <Script src="https://www.googletagmanager.com/gtag/js?id=G-34K32M7LQ3" strategy="afterInteractive" />
+
+      {/* Analytics Scripts */}
+      <Script 
+        src="https://www.googletagmanager.com/gtag/js?id=G-34K32M7LQ3" 
+        strategy="afterInteractive" 
+      />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-34K32M7LQ3', {
-            page_path: window.location.pathname,
-          });
+          gtag('config', 'G-34K32M7LQ3');
+          gtag('config', 'AW-YOUR_CONVERSION_ID');
         `}
       </Script>
-      {/* Facebook Pixel Code */}
+      
+      {/* Facebook Pixel */}
       <Script id="facebook-pixel" strategy="afterInteractive">
         {`
-          !function(f,b,e,v,n,t,s)
-          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-          n.queue=[];t=b.createElement(e);t.async=!0;
-          t.src=v;s=b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t,s)}(window, document,'script',
-          'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', 'your-pixel-id-here');
-          fbq('track', 'PageView');
+          !function(f,b,e,v,n,t,s){
+            if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window,document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', 'YOUR_PIXEL_ID');
+            fbq('track', 'PageView');
         `}
       </Script>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {children}
-          <Suspense fallback={null}>
-            <PageViewTracker />
-          </Suspense>
-          <FloatingContactButton />
-          <StructuredData
-            type="LocalBusiness"
-            title="Cipta Mandiri Perkasa"
-            description="Spesialis pembuatan kubah masjid, mimbar, menara, kerawangan, dan ornamen islami dengan kualitas terbaik."
-          />
+      <noscript>
+        <img 
+          height="1" 
+          width="1" 
+          src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"
+          alt="Facebook Pixel Fallback"
+        />
+      </noscript>
+
+      <body className={`${inter.className} antialiased`}>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="light" 
+          enableSystem 
+          disableTransitionOnChange
+        >
+          <ErrorBoundary fallback={<div>Something went wrong. Please refresh the page.</div>}>
+            <Suspense fallback={<LoadingIndicator />}>
+              {children}
+              
+              <PageViewTracker />
+              <FloatingContactButton />
+              
+              <StructuredData
+              type="LocalBusiness"
+              title="Cipta Mandiri Perkasa"
+              description="Spesialis GRC Kubah Masjid & Ornamen Islami"
+              imageUrl="/images/logo.png"
+              sameAs={[
+                "https://facebook.com/ciptamandiriperkasa",
+                "https://instagram.com/ciptamandiriperkasa"
+              ]}
+              address={{
+                streetAddress: "Jl. Raya Tambelang No.RT.02",
+                addressLocality: "Kertamukti, Bekasi",
+                postalCode: "17520",
+                addressCountry: "ID"
+              }}
+            />
+            </Suspense>
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
-import "./globals.css"
-
-import "./globals.css"

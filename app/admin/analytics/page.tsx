@@ -1,5 +1,19 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge"
+
+import { TableCell } from "@/components/ui/table"
+
+import { TableBody } from "@/components/ui/table"
+
+import { TableHead } from "@/components/ui/table"
+
+import { TableRow } from "@/components/ui/table"
+
+import { TableHeader } from "@/components/ui/table"
+
+import { Table } from "@/components/ui/table"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -22,11 +36,9 @@ import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { AreaChart } from "@tremor/react"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import ExportAnalyticsButton from "@/components/analytics/export-analytics-button"
 import { PieChart, Pie, Cell, Tooltip, LabelList, ResponsiveContainer } from "recharts"
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 
 // Define types for analytics data
 interface AnalyticsData {
@@ -90,13 +102,13 @@ interface ChartDataPoint {
 
 interface TooltipProps {
   payload?: {
-    payload: any;
-    value: number;
-    name: string;
-    color: string;
-  }[];
-  label?: string;
-  active?: boolean;
+    payload: any
+    value: number
+    name: string
+    color: string
+  }[]
+  label?: string
+  active?: boolean
 }
 
 export default function AnalyticsPage() {
@@ -113,6 +125,8 @@ export default function AnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setIsLoading(true)
+      // Gunakan tanggal hari ini untuk endDate
+      const endDate = new Date()
       const response = await fetch(
         `/api/analytics?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
       )
@@ -215,7 +229,12 @@ export default function AnalyticsPage() {
   const prepareVisitorChartData = (): ChartDataPoint[] => {
     if (!analyticsData?.dailyAnalytics) return []
 
-    return analyticsData.dailyAnalytics.map((day) => ({
+    // Urutkan data berdasarkan tanggal untuk memastikan data terbaru ditampilkan dengan benar
+    const sortedData = [...analyticsData.dailyAnalytics].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    )
+
+    return sortedData.map((day) => ({
       date: format(new Date(day.date), "dd MMM"),
       "Page Views": day.pageViews || 0,
       "Unique Visitors": day.uniqueVisitors || 0,
@@ -339,7 +358,7 @@ export default function AnalyticsPage() {
     Mobile: "#8b5cf6", // Purple
     Tablet: "#10b981", // Emerald
     Other: "#f59e0b", // Amber
-  };
+  }
 
   // Browser colors for the chart
   const browserColors: Record<string, string> = {
@@ -351,7 +370,7 @@ export default function AnalyticsPage() {
     "Samsung Internet": "#8b5cf6", // Purple
     IE: "#6b7280", // Gray
     Other: "#f59e0b", // Amber
-  };
+  }
 
   // Get color for device
   const getDeviceColor = (deviceType: string): string => {
@@ -563,17 +582,17 @@ export default function AnalyticsPage() {
                   <CardDescription>Page views and unique visitors over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <AreaChart
-                    className="h-72"
-                    data={prepareVisitorChartData()}
-                    index="date"
-                    categories={["Page Views", "Unique Visitors", "New Visitors", "Returning Visitors"]}
-                    colors={["blue", "indigo", "green", "purple"]}
-                    valueFormatter={(number: number) => number.toString()}
-                    showLegend
-                    showAnimation
-                    customTooltip={visitorChartTooltip}
-                  />
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RechartsLineChart data={prepareVisitorChartData()}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="Page Views" stroke="#8884d8" activeDot={{ r: 8 }} />
+                      <Line type="monotone" dataKey="Unique Visitors" stroke="#82ca9d" />
+                    </RechartsLineChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
 
@@ -590,7 +609,7 @@ export default function AnalyticsPage() {
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
-                      <Pie
+                        <Pie
                           data={prepareDeviceDataWithColors()}
                           cx="50%"
                           cy="50%"
@@ -650,7 +669,7 @@ export default function AnalyticsPage() {
                         />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="mt-4 flex flex-wrap justify-center gap-3">
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
                       {Object.entries(deviceColors).map(([name, color]) => (
                         <div key={name} className="flex items-center bg-gray-50 px-2 py-1 rounded-full">
                           <div className="h-3 w-3 rounded-full mr-1" style={{ backgroundColor: color }}></div>
@@ -692,7 +711,7 @@ export default function AnalyticsPage() {
                               <text
                                 x={x}
                                 y={y}
-                                fill="#FFFFFF" 
+                                fill="#FFFFFF"
                                 textAnchor="middle"
                                 dominantBaseline="central"
                                 fontSize={14}
@@ -710,6 +729,7 @@ export default function AnalyticsPage() {
                                 <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 min-w-[180px]">
                                   <h3 className="font-semibold mb-2">Browser Breakdown</h3>
                                   <p className="text-sm text-gray-500 mb-3">Visitors by browser</p>
+
                                   <div className="space-y-2">
                                     {payload.map((entry, index) => (
                                       <div key={index} className="flex justify-between items-center">
@@ -939,11 +959,11 @@ export default function AnalyticsPage() {
                         <TableCell>
                           <div className="flex items-center">
                             {visitor.device === "mobile" ? (
-                              <Smartphone className="h-4 w-4 mr-2 text-gray-500" />
+                              <Smartphone className="h-4 w-4 mr-1 text-gray-500" />
                             ) : visitor.device === "tablet" ? (
-                              <Tablet className="h-4 w-4 mr-2 text-gray-500" />
+                              <Tablet className="h-4 w-4 mr-1 text-gray-500" />
                             ) : (
-                              <Monitor className="h-4 w-4 mr-2 text-gray-500" />
+                              <Monitor className="h-4 w-4 mr-1 text-gray-500" />
                             )}
                             <span>{visitor.device}</span>
                           </div>

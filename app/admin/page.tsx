@@ -25,7 +25,6 @@ import { motion } from "framer-motion"
 import DashboardCard from "@/components/admin/dashboard-card"
 import ActivityCard from "@/components/admin/activity-card"
 import StatsCard from "@/components/admin/stats-card"
-import { AreaChart } from "@tremor/react"
 import { Button } from "@/components/ui/button"
 import { format, subDays, formatDistanceToNow } from "date-fns"
 import { id } from "date-fns/locale"
@@ -41,6 +40,7 @@ import {
 } from "@/components/ui/dialog"
 import Image from "next/image"
 import { PieChart, Pie, Cell, Tooltip, LabelList, ResponsiveContainer } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, Brush } from "recharts"
 
 interface DashboardData {
   blogCount: number
@@ -182,8 +182,9 @@ export default function AdminDashboard() {
   // Function to generate mock visitor data for the last 7 days
   const generateMockVisitorData = () => {
     const data = []
+    const today = new Date()
     for (let i = 6; i >= 0; i--) {
-      const date = subDays(new Date(), i)
+      const date = subDays(today, i)
       data.push({
         date: format(date, "d MMM", { locale: id }),
         Pengunjung: Math.floor(Math.random() * 100) + 50,
@@ -289,14 +290,16 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     setRefreshing(true)
     try {
+      // Gunakan tanggal hari ini untuk endDate
+      const today = new Date()
+      const startDate = subDays(today, 7)
+
       // Fetch content counts
       const [blogRes, galleryRes, testimonialRes, analyticsRes, realTimeRes] = await Promise.all([
         fetch("/api/blog"),
         fetch("/api/gallery"),
         fetch("/api/testimonials?admin=true"),
-        fetch(
-          `/api/analytics?startDate=${format(subDays(new Date(), 7), "yyyy-MM-dd")}&endDate=${format(new Date(), "yyyy-MM-dd")}`,
-        ),
+        fetch(`/api/analytics?startDate=${format(startDate, "yyyy-MM-dd")}&endDate=${format(today, "yyyy-MM-dd")}`),
         fetch("/api/analytics?realTime=true"),
       ])
 
@@ -703,10 +706,10 @@ export default function AdminDashboard() {
         </div>
         <div className="h-full">
           <DashboardCard
-            title="Pending Testimoni"
+            title="Pending Testi"
             value={data?.pendingTestimonialCount || 0}
             icon={<Users className="h-8 w-8" />}
-            description="Testimoni menunggu persetujuan"
+            description="Testimoni menunggu Acc"
             color="red"
             index={3}
             badge={newTestimonialAlert ? "Baru!" : undefined}
@@ -836,16 +839,37 @@ export default function AdminDashboard() {
               </div>
             </div>
             {visitorChartData.length > 0 ? (
-              <AreaChart
-                className="h-72"
-                data={visitorChartData}
-                index="date"
-                categories={["Pengunjung", "Tampilan Halaman"]}
-                colors={["indigo", "cyan"]}
-                valueFormatter={(number) => `${Intl.NumberFormat("id").format(number)}`}
-                showLegend
-                showAnimation
-              />
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={visitorChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis tickFormatter={(value) => `${Intl.NumberFormat("id").format(value)}`} />
+                    <RechartsTooltip
+                      formatter={(value: number) => [`${Intl.NumberFormat("id").format(value)}`, ""]}
+                      labelFormatter={(label) => `Tanggal: ${label}`}
+                    />
+                    <Legend />
+                    <Brush dataKey="date" height={30} stroke="#8884d8" />
+                    <Line
+                      type="monotone"
+                      dataKey="Pengunjung"
+                      stroke="#6366f1"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="Tampilan Halaman"
+                      stroke="#06b6d4"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             ) : (
               <div className="h-72 flex items-center justify-center bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Tidak ada data pengunjung tersedia</p>
