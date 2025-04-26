@@ -104,7 +104,7 @@ export default function StructuredData({
             name: organizationName,
             logo: {
               "@type": "ImageObject",
-              url: `${url}/images/logo.png`,
+              url: `${url}/images/logo-baru.png`,
             },
           },
         }
@@ -138,7 +138,7 @@ export default function StructuredData({
           ...baseData,
           "@type": "Organization",
           name: organizationName || title,
-          logo: `${url}/images/logo.png`,
+          logo: `${url}/images/logo-baru.png`,
           contactPoint: {
             "@type": "ContactPoint",
             telephone: "+6281386225702",

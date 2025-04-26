@@ -381,7 +381,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@type": "Organization",
               name: "Cipta Mandiri Perkasa",
               url: "https://kubahcmp.id",
-              logo: "https://kubahcmp.id/images/logo.png",
+              logo: "https://kubahcmp.id/images/logo-baru.png",
               sameAs: [
                 "https://facebook.com/yourpage",
                 "https://instagram.com/yourprofile",
@@ -456,7 +456,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               type="LocalBusiness"
               title="Cipta Mandiri Perkasa"
               description="Spesialis GRC Kubah Masjid & Ornamen Islami"
-              imageUrl="/images/logo.png"
+              imageUrl="/images/logo-baru.png"
               sameAs={[
                 "https://facebook.com/ciptamandiriperkasa",
                 "https://instagram.com/ciptamandiriperkasa"
