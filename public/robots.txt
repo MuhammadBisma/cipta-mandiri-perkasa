@@ -1,15 +1,9 @@
+# *
 User-agent: *
 Allow: /
 
-Disallow: /admin/
-Disallow: /login/
-
+# Host
 Host: https://kubahcmp.id
 
+# Sitemaps
 Sitemap: https://kubahcmp.id/sitemap.xml
-
-User-agent: Googlebot
-Allow: /
-
-User-agent: BadBot
-Disallow: /

@@ -179,20 +179,106 @@ export default function AdminDashboard() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [approvedTestimonial, setApprovedTestimonial] = useState<Testimonial | null>(null)
 
-  // Function to generate mock visitor data for the last 7 days
-  const generateMockVisitorData = () => {
+  // Function to generate visitor data for the last 7 days
+  const generateLast7DaysData = () => {
     const data = []
     const today = new Date()
+
+    // Generate data for the last 7 days
     for (let i = 6; i >= 0; i--) {
       const date = subDays(today, i)
       data.push({
         date: format(date, "d MMM", { locale: id }),
-        Pengunjung: Math.floor(Math.random() * 100) + 50,
-        "Tampilan Halaman": Math.floor(Math.random() * 200) + 100,
+        fullDate: format(date, "yyyy-MM-dd"),
+        Pengunjung: 0,
+        "Tampilan Halaman": 0,
       })
     }
     return data
   }
+
+  // Function to prepare chart data with the last 7 days
+  const prepareVisitorChartData = (analyticsData: any) => {
+    // Create an array of the last 7 days
+    const result: any[] = []
+    const endDate = new Date()
+    const startDate = new Date(endDate)
+    startDate.setDate(endDate.getDate() - 6) // Get 7 days including today
+
+    // Generate all 7 days with zero values as default
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(startDate)
+      currentDate.setDate(startDate.getDate() + i)
+      const formattedDate = format(currentDate, "d MMM", { locale: id })
+
+      result.push({
+        date: formattedDate,
+        fullDate: currentDate.toISOString().split("T")[0], // Store full date for comparison
+        Pengunjung: 0,
+        "Tampilan Halaman": 0,
+      })
+    }
+
+    // Fill in actual data where available
+    if (analyticsData?.dailyAnalytics && Array.isArray(analyticsData.dailyAnalytics)) {
+      analyticsData.dailyAnalytics.forEach((day: any) => {
+        try {
+          const dayDate = new Date(day.date)
+          const formattedFullDate = dayDate.toISOString().split("T")[0]
+
+          // Find matching day in our result array
+          const matchingDay = result.find((item) => item.fullDate === formattedFullDate)
+          if (matchingDay) {
+            matchingDay["Pengunjung"] = day.uniqueVisitors || 0
+            matchingDay["Tampilan Halaman"] = day.pageViews || 0
+          }
+        } catch (err) {
+          console.error("Error parsing date:", day.date, err)
+        }
+      })
+    }
+
+    // Remove the fullDate property as it's only used for matching
+    return result.map(({ fullDate, ...rest }) => rest)
+  }
+
+  // Function to prepare chart data with the last 7 days
+  // const prepareVisitorChartData = (analyticsData: any) => {
+  //   // Generate base data structure for the last 7 days
+  //   const baseData = generateLast7DaysData()
+
+  //   // If we have analytics data, fill in the actual values
+  //   if (analyticsData?.dailyAnalytics && Array.isArray(analyticsData.dailyAnalytics)) {
+  //     // Create a map for quick lookup
+  //     const analyticsMap = new Map()
+
+  //     analyticsData.dailyAnalytics.forEach((day: any) => {
+  //       try {
+  //         // Parse the date and format it to YYYY-MM-DD for consistent comparison
+  //         const dateObj = new Date(day.date)
+  //         const dateKey = format(dateObj, "yyyy-MM-dd")
+  //         analyticsMap.set(dateKey, {
+  //           pageViews: day.pageViews || 0,
+  //           uniqueVisitors: day.uniqueVisitors || 0,
+  //         })
+  //       } catch (err) {
+  //         console.error("Error parsing date:", day.date, err)
+  //       }
+  //     })
+
+  //     // Update the base data with actual values where available
+  //     baseData.forEach((day, index) => {
+  //       const analyticsForDay = analyticsMap.get(day.fullDate)
+  //       if (analyticsForDay) {
+  //         day.Pengunjung = analyticsForDay.uniqueVisitors
+  //         day["Tampilan Halaman"] = analyticsForDay.pageViews
+  //       }
+  //     })
+  //   }
+
+  //   // Remove the fullDate property as it's only used for matching
+  //   return baseData.map(({ fullDate, ...rest }) => rest)
+  // }
 
   // Function to fetch pending testimonials
   const fetchPendingTestimonials = async () => {
@@ -286,15 +372,30 @@ export default function AdminDashboard() {
     }
   }
 
+  // Function to refresh analytics data
+  const refreshAnalyticsData = async () => {
+    try {
+      // Call the API to refresh analytics data
+      await fetch("/api/analytics/refresh", {
+        method: "POST",
+      })
+
+      // Fetch the updated data
+      fetchDashboardData()
+    } catch (err) {
+      console.error("Error refreshing analytics data:", err)
+    }
+  }
+
   // Function to fetch all dashboard data
   const fetchDashboardData = async () => {
     setRefreshing(true)
     try {
       // Gunakan tanggal hari ini untuk endDate
       const today = new Date()
-      const startDate = subDays(today, 7)
+      const startDate = subDays(today, 6) // Get data for the last 7 days (including today)
 
-      // Fetch content counts
+      // Gunakan Promise.all untuk melakukan fetching secara paralel
       const [blogRes, galleryRes, testimonialRes, analyticsRes, realTimeRes] = await Promise.all([
         fetch("/api/blog"),
         fetch("/api/gallery"),
@@ -302,7 +403,7 @@ export default function AdminDashboard() {
         fetch(`/api/analytics?startDate=${format(startDate, "yyyy-MM-dd")}&endDate=${format(today, "yyyy-MM-dd")}`),
         fetch("/api/analytics?realTime=true"),
       ])
-
+      
       if (!blogRes.ok || !galleryRes.ok || !testimonialRes.ok) {
         throw new Error("Failed to fetch content data")
       }
@@ -311,6 +412,7 @@ export default function AdminDashboard() {
         throw new Error("Failed to fetch analytics data")
       }
 
+      // Gunakan Promise.all untuk parsing JSON secara paralel
       const [blogData, galleryData, testimonialData, analytics, realTime] = await Promise.all([
         blogRes.json(),
         galleryRes.json(),
@@ -319,17 +421,14 @@ export default function AdminDashboard() {
         realTimeRes.json(),
       ])
 
-      // Fetch pending testimonials
-      const pendingCount = await fetchPendingTestimonials()
-
-      // Fetch popular services
-      await fetchPopularServices()
+      // Fetch pending testimonials dan popular services secara paralel
+      const [pendingCount, services] = await Promise.all([fetchPendingTestimonials(), fetchPopularServices()])
 
       // Set dashboard data
       setData({
-        blogCount: blogData.length || 0,
-        galleryCount: galleryData.length || 0,
-        testimonialCount: testimonialData.length || 0,
+        blogCount: blogData.total || blogData.length || 0,
+        galleryCount: galleryData.total || galleryData.length || 0,
+        testimonialCount: testimonialData.total || testimonialData.length || 0,
         pendingTestimonialCount: pendingCount,
         userName: "Admin", // This could come from a user profile API
       })
@@ -338,24 +437,10 @@ export default function AdminDashboard() {
       setAnalyticsData(analytics)
       setRealTimeVisitors(Array.isArray(realTime) ? realTime : [])
 
-      // Generate visitor chart data from the last 7 days
-      let chartData = []
-
-      // Check if we have daily analytics data from the API
-      if (analytics.dailyAnalytics && Array.isArray(analytics.dailyAnalytics) && analytics.dailyAnalytics.length > 0) {
-        // Use real data from API
-        chartData = analytics.dailyAnalytics.map((day: any) => ({
-          date: format(new Date(day.date), "d MMM", { locale: id }),
-          Pengunjung: day.uniqueVisitors || 0,
-          "Tampilan Halaman": day.pageViews || 0,
-        }))
-      } else {
-        // If no data or wrong format, use mock data
-        console.log("Using mock visitor data because API data is not available or in wrong format")
-        chartData = generateMockVisitorData()
-      }
-
-      setVisitorChartData(chartData)
+      // Prepare visitor chart data with the last 7 days
+      // const chartData = prepareVisitorChartData(analytics)
+      // setVisitorChartData(chartData)
+      setVisitorChartData(prepareVisitorChartData(analytics))
 
       // Generate recent activities
       const recentActivities: Activity[] = []
@@ -371,8 +456,8 @@ export default function AdminDashboard() {
       }
 
       // Add recent blog posts
-      if (Array.isArray(blogData) && blogData.length > 0) {
-        const recentBlog = blogData[0]
+      if (Array.isArray(blogData.posts || blogData) && (blogData.posts || blogData).length > 0) {
+        const recentBlog = (blogData.posts || blogData)[0]
         recentActivities.push({
           id: `blog-${recentBlog.id}`,
           title: `Blog post baru: ${recentBlog.title}`,
@@ -392,8 +477,8 @@ export default function AdminDashboard() {
       }
 
       // Add recent gallery items
-      if (Array.isArray(galleryData) && galleryData.length > 0) {
-        const recentGallery = galleryData[0]
+      if (Array.isArray(galleryData.items || galleryData) && (galleryData.items || galleryData).length > 0) {
+        const recentGallery = (galleryData.items || galleryData)[0]
         recentActivities.push({
           id: `gallery-${recentGallery.id}`,
           title: `Foto baru: ${recentGallery.title}`,
@@ -417,7 +502,11 @@ export default function AdminDashboard() {
       setError("Gagal memuat data dashboard. Silakan coba lagi.")
 
       // Set fallback data for charts
-      setVisitorChartData(generateMockVisitorData())
+      // setVisitorChartData(generateLast7DaysData().map(({ fullDate, ...rest }) => rest))
+      const fallbackData = {
+        dailyAnalytics: [],
+      }
+      setVisitorChartData(prepareVisitorChartData(fallbackData))
 
       // Set fallback data for services
       const defaultServices = [
@@ -564,11 +653,40 @@ export default function AdminDashboard() {
     }
   }, [toast])
 
-  // Fetch data on component mount
+  // Refresh analytics data when the component mounts and daily
+  useEffect(() => {
+    // Refresh analytics data when the component mounts
+    refreshAnalyticsData()
+
+    // Set up interval to refresh analytics data every day at midnight
+    const setDailyRefresh = () => {
+      const now = new Date()
+      const tomorrow = new Date(now)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(0, 0, 0, 0)
+
+      const timeUntilMidnight = tomorrow.getTime() - now.getTime()
+
+      // Set timeout to refresh at midnight
+      const timeoutId = setTimeout(() => {
+        refreshAnalyticsData()
+        // Reset the daily refresh
+        setDailyRefresh()
+      }, timeUntilMidnight)
+
+      return timeoutId
+    }
+
+    const timeoutId = setDailyRefresh()
+
+    return () => clearTimeout(timeoutId)
+  }, [])
+
+  // Fetch dashboard data on component mount
   useEffect(() => {
     fetchDashboardData()
 
-    // Set up interval to refresh real-time visitors every 30 seconds
+    // Set up interval to refresh real-time visitors every 60 seconds
     const interval = setInterval(async () => {
       try {
         const res = await fetch("/api/analytics?realTime=true")
@@ -581,7 +699,7 @@ export default function AdminDashboard() {
       } catch (err) {
         console.error("Error refreshing real-time visitors:", err)
       }
-    }, 30000)
+    }, 60000) // 1 minute
 
     return () => clearInterval(interval)
   }, [])

@@ -2,17 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 
-import { TableCell } from "@/components/ui/table"
-
-import { TableBody } from "@/components/ui/table"
-
-import { TableHead } from "@/components/ui/table"
-
-import { TableRow } from "@/components/ui/table"
-
-import { TableHeader } from "@/components/ui/table"
-
-import { Table } from "@/components/ui/table"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -97,7 +87,8 @@ interface RealTimeVisitor {
 
 interface ChartDataPoint {
   date: string
-  [key: string]: string | number
+  fullDate?: string
+  [key: string]: string | number | undefined
 }
 
 interface TooltipProps {
@@ -125,8 +116,11 @@ export default function AnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setIsLoading(true)
-      // Gunakan tanggal hari ini untuk endDate
+      // Selalu ambil data 7 hari terakhir
       const endDate = new Date()
+      const startDate = new Date(endDate)
+      startDate.setDate(endDate.getDate() - 6) // 7 hari termasuk hari ini
+
       const response = await fetch(
         `/api/analytics?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
       )
@@ -206,7 +200,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     fetchAnalytics()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startDate, endDate])
+  }, [])
 
   // Fetch real-time visitors when on the real-time tab
   useEffect(() => {
@@ -227,20 +221,42 @@ export default function AnalyticsPage() {
 
   // Prepare chart data
   const prepareVisitorChartData = (): ChartDataPoint[] => {
-    if (!analyticsData?.dailyAnalytics) return []
+    // Create an array of the last 7 days
+    const result: ChartDataPoint[] = []
+    const endDate = new Date()
+    const startDate = new Date(endDate)
+    startDate.setDate(endDate.getDate() - 6) // Get 7 days including today
 
-    // Urutkan data berdasarkan tanggal untuk memastikan data terbaru ditampilkan dengan benar
-    const sortedData = [...analyticsData.dailyAnalytics].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-    )
+    // Generate all 7 days with zero values as default
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(startDate)
+      currentDate.setDate(startDate.getDate() + i)
+      const formattedDate = format(currentDate, "dd MMM")
 
-    return sortedData.map((day) => ({
-      date: format(new Date(day.date), "dd MMM"),
-      "Page Views": day.pageViews || 0,
-      "Unique Visitors": day.uniqueVisitors || 0,
-      "New Visitors": 0, // Default value if not available
-      "Returning Visitors": 0, // Default value if not available
-    }))
+      result.push({
+        date: formattedDate,
+        fullDate: currentDate.toISOString().split("T")[0], // Store full date for comparison
+        "Page Views": 0,
+        "Unique Visitors": 0,
+      })
+    }
+
+    // Fill in actual data where available
+    if (analyticsData?.dailyAnalytics) {
+      analyticsData.dailyAnalytics.forEach((day) => {
+        const dayDate = new Date(day.date)
+        const formattedFullDate = dayDate.toISOString().split("T")[0]
+
+        // Find matching day in our result array
+        const matchingDay = result.find((item) => item.fullDate === formattedFullDate)
+        if (matchingDay) {
+          matchingDay["Page Views"] = day.pageViews || 0
+          matchingDay["Unique Visitors"] = day.uniqueVisitors || 0
+        }
+      })
+    }
+
+    return result
   }
 
   // Add a custom tooltip for the visitor chart to show more detailed information
