@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { CalculatorIcon, InfoIcon } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-
 type Material = {
   name: string
   price: number
@@ -45,7 +44,7 @@ type PriceData = {
   "kubah": CalculatorData
   "mimbar": CalculatorData
   "menara": CalculatorData
-  "kerawangan" : CalculatorData
+  "kerawangan": CalculatorData
   "kaligrafi": CalculatorData
   "ornamen": CalculatorData
 }
@@ -82,26 +81,24 @@ const priceData: PriceData = {
       "Waktu pengerjaan: Standard (6-8 bulan), Premium (8-10 bulan), Luxury (10-12 bulan)"
     ]
   },
-  "kubah": {
+  kubah: {
     title: "Kalkulator Biaya Kubah Masjid",
-    description: "Masukkan spesifikasi kubah untuk mendapatkan estimasi biaya",
+    description: "Masukkan diameter dan tinggi kubah untuk mendapatkan estimasi biaya",
     materials: {
-      enamel: { name: "Enamel", price: 2500000 },
-      stainless: { name: "Stainless Steel", price: 3500000 },
-      titanium: { name: "Titanium Gold", price: 5000000 },
+      luar: { name: "Kubah Luar", price: 850000 },
+      dalam: { name: "Kubah Dalam", price: 750000 },
     },
     sizeLabel: "Diameter Kubah (meter)",
-    sizeMultiplier: 0.5,
+    sizeMultiplier: 1,
     minSize: 3,
     maxSize: 25,
     catatan: [
       "Harga sudah termasuk rangka baja galvanis",
-      "Titanium Gold tahan karat hingga 25 tahun",
       "Pemasangan membutuhkan crane untuk diameter >10m",
       "Terima pembayaran: 50% di awal, 30% progres, 20% finishing"
     ]
   },
-  "mimbar": {
+  mimbar: {
     title: "Kalkulator Biaya Mimbar Masjid",
     description: "Masukkan spesifikasi mimbar untuk mendapatkan estimasi biaya",
     materials: {
@@ -128,7 +125,7 @@ const priceData: PriceData = {
       "Garansi 5 tahun untuk material kayu"
     ]
   },
-  "menara": {
+  menara: {
     title: "Kalkulator Biaya Menara Masjid",
     description: "Masukkan spesifikasi menara untuk mendapatkan estimasi biaya",
     materials: {
@@ -168,9 +165,9 @@ const priceData: PriceData = {
       "Harga termasuk instalasi untuk area <10m²"
     ]
   },
-  "kaligrafi": {
-    title: "Kalkulator Biaya Awan Kaligrafi",
-    description: "Masukkan spesifikasi awan kaligrafi untuk mendapatkan estimasi biaya",
+  kaligrafi: {
+    title: "Kalkulator Biaya Kaligrafi",
+    description: "Masukkan spesifikasi kaligrafi untuk mendapatkan estimasi biaya",
     materials: {
       kuningan: { name: "Kuningan", price: 3000000 },
       aluminium: { name: "Aluminium", price: 2000000 },
@@ -223,8 +220,10 @@ export default function ServiceCalculator({ serviceType }: ServiceCalculatorProp
   const [sizeValue, setSizeValue] = useState<string>(
     calculatorData.sizeOptions?.[0]?.value?.toString() ?? calculatorData.minSize.toString()
   )
+  const [heightValue, setHeightValue] = useState<string>("3")
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
   const [result, setResult] = useState<number | null>(null)
+  const [domeType, setDomeType] = useState<"luar" | "dalam">("luar")
 
   const toggleOption = (optionId: string) => {
     setSelectedOptions(prev => 
@@ -233,20 +232,39 @@ export default function ServiceCalculator({ serviceType }: ServiceCalculatorProp
   }
 
   const calculatePrice = () => {
-    const basePrice = materialOptions[selectedMaterial].price
-    const size = parseFloat(sizeValue)
-    const sizeMultiplier = calculatorData.sizeMultiplier * size
-    let totalPrice = basePrice * sizeMultiplier
+    if (serviceType === "kubah") {
+      const diameter = parseFloat(sizeValue)
+      const tinggi = parseFloat(heightValue)
+      const lebar = diameter * 3.14
+      const luas = lebar * tinggi
+      const basePrice = domeType === "luar" ? 850000 : 750000
+      let totalPrice = luas * basePrice
 
-    if (calculatorData.additionalOptions) {
-      calculatorData.additionalOptions.forEach(option => {
-        if (selectedOptions.includes(option.id)) {
-          totalPrice += option.price
-        }
-      })
+      if (calculatorData.additionalOptions) {
+        calculatorData.additionalOptions.forEach(option => {
+          if (selectedOptions.includes(option.id)) {
+            totalPrice += option.price
+          }
+        })
+      }
+
+      setResult(totalPrice)
+    } else {
+      const basePrice = materialOptions[selectedMaterial].price
+      const size = parseFloat(sizeValue)
+      const sizeMultiplier = calculatorData.sizeMultiplier * size
+      let totalPrice = basePrice * sizeMultiplier
+
+      if (calculatorData.additionalOptions) {
+        calculatorData.additionalOptions.forEach(option => {
+          if (selectedOptions.includes(option.id)) {
+            totalPrice += option.price
+          }
+        })
+      }
+
+      setResult(totalPrice)
     }
-
-    setResult(totalPrice)
   }
 
   const formatCurrency = (value: number) => {
@@ -269,71 +287,113 @@ export default function ServiceCalculator({ serviceType }: ServiceCalculatorProp
         </CardHeader>
         
         <CardContent className="pt-6 space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {/* Material Selection (Always Select) */}
-          <div className="space-y-2">
-          <div className="flex items-center gap-2">
-          <Label htmlFor="material-type">Jenis Material</Label>
-          <Popover>
-          <PopoverTrigger asChild>
-          <Button 
-            variant="ghost" 
-              size="icon" 
-              className="h-4 w-4 rounded-full bg-white hover:bg-gray-100 focus:bg-white"
-              >
-          <InfoIcon className="h-3 w-3 text-muted-foreground" />
-          </Button>
-            </PopoverTrigger>
-              <PopoverContent className="w-80 bg-white">
-                <p className="text-sm">Pilih material yang sesuai dengan kebutuhan dan budget Anda</p>
-                <ul className="mt-2 list-disc pl-4 space-y-1">
-                {Object.entries(materialOptions).map(([key, material]) => (
-            <li key={key} className="text-sm">
-              <strong>{material.name}</strong>: {formatCurrency(material.price)} per m²
-            </li>
-          ))}
-        </ul>
-      </PopoverContent>
-    </Popover>
-  </div>
-  <div className="grid grid-cols-3 gap-2">
-    {Object.entries(materialOptions).map(([value, material]) => (
-      <div key={value} className="flex items-center space-x-2">
-        <input
-          type="radio"
-          id={`material-${value}`}
-          name="material-type"
-          value={value}
-          checked={selectedMaterial === value}
-          onChange={() => setSelectedMaterial(value)}
-          className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
-        />
-        <Label htmlFor={`material-${value}`} className="text-sm font-normal">
-          {material.name}
-        </Label>
-      </div>
-    ))}
-  </div>
-</div>
-</div>
+          {/* Pilihan Kubah Luar/Dalam (hanya untuk kubah) */}
+          {serviceType === "kubah" && (
+            <div className="space-y-2">
+              <Label className="block mb-2">Jenis Kubah</Label>
+              <div className="flex gap-2">
+                <Button
+                  variant={domeType === "luar" ? "default" : "outline"}
+                  onClick={() => setDomeType("luar")}
+                  className="flex-1"
+                >
+                  Kubah Luar
+                </Button>
+                <Button
+                  variant={domeType === "dalam" ? "default" : "outline"}
+                  onClick={() => setDomeType("dalam")}
+                  className="flex-1"
+                >
+                  Kubah Dalam
+                </Button>
+              </div>
+            </div>
+          )}
 
-<div className="space-y-2">
-  <Label htmlFor="size">{calculatorData.sizeLabel}</Label>
-  <div className="flex items-center gap-2">
-    <Input
-      id="size"
-      type="number"
-      min={calculatorData.minSize}
-      max={calculatorData.maxSize}
-      value={sizeValue}
-      onChange={(e) => setSizeValue(e.target.value)}
-      className="w-full"
-    />
-    <span className="text-sm text-muted-foreground whitespace-nowrap">
-      Min: {calculatorData.minSize}, Max: {calculatorData.maxSize}
-    </span>
-  </div>
-</div>
+          {/* Material Selection (untuk selain kubah) */}
+          {serviceType !== "kubah" && (
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="material-type">Jenis Material</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-4 w-4 rounded-full bg-white hover:bg-gray-100 focus:bg-white"
+                      >
+                        <InfoIcon className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 bg-white">
+                      <p className="text-sm">Pilih material yang sesuai dengan kebutuhan dan budget Anda</p>
+                      <ul className="mt-2 list-disc pl-4 space-y-1">
+                        {Object.entries(materialOptions).map(([key, material]) => (
+                          <li key={key} className="text-sm">
+                            <strong>{material.name}</strong>: {formatCurrency(material.price)} per m²
+                          </li>
+                        ))}
+                      </ul>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.entries(materialOptions).map(([value, material]) => (
+                    <div key={value} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id={`material-${value}`}
+                        name="material-type"
+                        value={value}
+                        checked={selectedMaterial === value}
+                        onChange={() => setSelectedMaterial(value)}
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                      />
+                      <Label htmlFor={`material-${value}`} className="text-sm font-normal">
+                        {material.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Input untuk diameter/size */}
+          <div className="space-y-2">
+            <Label htmlFor="size">{calculatorData.sizeLabel}</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="size"
+                type="number"
+                min={calculatorData.minSize}
+                max={calculatorData.maxSize}
+                value={sizeValue}
+                onChange={(e) => setSizeValue(e.target.value)}
+                className="w-full"
+              />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                Min: {calculatorData.minSize}, Max: {calculatorData.maxSize}
+              </span>
+            </div>
+          </div>
+
+          {/* Input khusus untuk tinggi kubah (hanya muncul untuk kubah) */}
+          {serviceType === "kubah" && (
+            <div className="space-y-2">
+              <Label htmlFor="height">Tinggi Kubah (meter)</Label>
+              <Input
+                id="height"
+                type="number"
+                min="1"
+                max="15"
+                value={heightValue}
+                onChange={(e) => setHeightValue(e.target.value)}
+                className="w-full"
+              />
+            </div>
+          )}
 
           {/* Additional Options */}
           {calculatorData.additionalOptions && (
@@ -377,26 +437,35 @@ export default function ServiceCalculator({ serviceType }: ServiceCalculatorProp
         
         <CardFooter className="flex flex-col items-stretch gap-4">
           <Button 
-          onClick={calculatePrice} 
-          className="w-full bg-primary hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98] transition-all duration-200"
-          size="lg"
-        >
-          Hitung Estimasi Biaya
-        </Button>
+            onClick={calculatePrice} 
+            className="w-full bg-primary hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98] transition-all duration-200"
+            size="lg"
+          >
+            Hitung Estimasi Biaya
+          </Button>
 
-        {result !== null && (
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center animate-fade-in">
-          <p className="text-gray-600 mb-1">Estimasi Biaya:</p>
-          <p className="text-3xl font-bold text-primary">
-            {formatCurrency(result)}
-          </p>
-          <div className="mt-3 text-sm text-gray-500 space-y-1">
-        <p>*Harga dapat berubah sesuai spesifikasi detail</p>
-        <p>*Terima pembayaran: 50% di awal, 40% progres, 10% finishing</p>
-      </div>
-    </div>
-  )}
-</CardFooter>
+          {result !== null && (
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center animate-fade-in">
+              <p className="text-gray-600 mb-1">Estimasi Biaya:</p>
+              <p className="text-3xl font-bold text-primary">
+                {formatCurrency(result)}
+              </p>
+              {serviceType === "kubah" && (
+                <div className="mt-2 text-sm text-gray-500">
+                  <p>Diameter: {sizeValue} meter</p>
+                  <p>Tinggi: {heightValue} meter</p>
+                  <p>Lebar: {(parseFloat(sizeValue) * 3.14).toFixed(2)} meter</p>
+                  <p>Luas: {(parseFloat(sizeValue) * 3.14 * parseFloat(heightValue)).toFixed(2)} m²</p>
+                  <p>Jenis: Kubah {domeType === "luar" ? "Luar" : "Dalam"}</p>
+                </div>
+              )}
+              <div className="mt-3 text-sm text-gray-500 space-y-1">
+                <p>*Harga dapat berubah sesuai spesifikasi detail</p>
+                <p>*Terima pembayaran: 50% di awal, 40% progres, 10% finishing</p>
+              </div>
+            </div>
+          )}
+        </CardFooter>
       </Card>
     </div>
   )

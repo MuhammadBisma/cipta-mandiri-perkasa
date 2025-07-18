@@ -185,10 +185,10 @@ export default async function ServicePage({ params }: Props) {
               </div>
             </div>
 
-            <div className="mb-16">
+            {/* <div className="mb-16">
               <h2 className="heading-secondary text-center mb-8">Kalkulator Estimasi Biaya {service.title}</h2>
               <ServiceCalculator serviceType={service.slug} />
-            </div>
+            </div> */}
 
             <div className="mb-16">
               <h2 className="heading-secondary text-center mb-8">Pertanyaan Umum</h2>
