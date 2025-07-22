@@ -67,7 +67,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-gray-600">Masuk ke dashboard admin Cipta Mandiri Perkasa</p>
         </div>
 
-        <Card>
+        <Card className="bg-white/90 backdrop-blur-md shadow-xl border border-gray-200 rounded-2xl">
           <CardHeader>
             <CardTitle>Login</CardTitle>
             <CardDescription>Masukkan username dan password Anda</CardDescription>
@@ -90,7 +90,7 @@ export default function LoginPage() {
                     id="username"
                     type="text"
                     placeholder="Username"
-                    className="pl-10 rounded-xl"
+                    className="pl-10 rounded-xl border-0 shadow-none focus:ring-0 focus:outline-none"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -107,7 +107,7 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="Password"
-                    className="pl-10 rounded-xl"
+                    className="pl-10 rounded-xl border-0 shadow-none focus:ring-0 focus:outline-none"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -128,8 +128,7 @@ export default function LoginPage() {
         </div>
         <Button 
           type="button"
-          variant="outline"
-          className="w-full gap-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white hover:text-white border-blue-500"
+          className="w-full bg-primary rounded-xl"
           onClick={() => router.push("/")}
           >
           <Home className="h-4 w-4" />
