@@ -135,6 +135,6 @@ export default function LoginPage() {
           Kembali ke Beranda
           </Button>
       </div>
-    </main>
+    </main> 
   )
 }
